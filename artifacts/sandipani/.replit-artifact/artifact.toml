@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Sandipani Smart School"
+version = "1.0.0"
+id = "artifacts/sandipani"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23367
+
+[services.development]
+run = "pnpm --filter @workspace/sandipani run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/sandipani", "run", "build" ]
+publicDir = "artifacts/sandipani/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23367"
+BASE_PATH = "/"

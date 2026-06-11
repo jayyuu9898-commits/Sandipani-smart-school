@@ -1,0 +1,74 @@
+import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
+import NotFound from "@/pages/not-found";
+import Splash from "@/pages/splash";
+import Login from "@/pages/login";
+import AdminDashboard from "@/pages/admin/Dashboard";
+import AdminStudents from "@/pages/admin/Students";
+import AdminTeachers from "@/pages/admin/Teachers";
+import AdminClasses from "@/pages/admin/Classes";
+import TeacherDashboard from "@/pages/teacher/Dashboard";
+import TeacherAttendance from "@/pages/teacher/Attendance";
+import TeacherHomework from "@/pages/teacher/Homework";
+import TeacherNotes from "@/pages/teacher/Notes";
+import TeacherResults from "@/pages/teacher/Results";
+import StudentDashboard from "@/pages/student/Dashboard";
+import StudentHomework from "@/pages/student/Homework";
+import StudentNotes from "@/pages/student/Notes";
+import StudentAttendance from "@/pages/student/Attendance";
+import StudentResults from "@/pages/student/Results";
+import StudentTimetable from "@/pages/student/Timetable";
+
+const queryClient = new QueryClient();
+
+function ProtectedRoute({ component: Component, role }: { component: React.ComponentType; role?: string }) {
+  const { user } = useAuth();
+  if (!user) return <Redirect to="/login" />;
+  if (role && user.role !== role) return <Redirect to="/login" />;
+  return <Component />;
+}
+
+function Router() {
+  return (
+    <Switch>
+      <Route path="/" component={Splash} />
+      <Route path="/login" component={Login} />
+      <Route path="/admin">{() => <ProtectedRoute component={AdminDashboard} role="admin" />}</Route>
+      <Route path="/admin/students">{() => <ProtectedRoute component={AdminStudents} role="admin" />}</Route>
+      <Route path="/admin/teachers">{() => <ProtectedRoute component={AdminTeachers} role="admin" />}</Route>
+      <Route path="/admin/classes">{() => <ProtectedRoute component={AdminClasses} role="admin" />}</Route>
+      <Route path="/teacher">{() => <ProtectedRoute component={TeacherDashboard} role="teacher" />}</Route>
+      <Route path="/teacher/attendance">{() => <ProtectedRoute component={TeacherAttendance} role="teacher" />}</Route>
+      <Route path="/teacher/homework">{() => <ProtectedRoute component={TeacherHomework} role="teacher" />}</Route>
+      <Route path="/teacher/notes">{() => <ProtectedRoute component={TeacherNotes} role="teacher" />}</Route>
+      <Route path="/teacher/results">{() => <ProtectedRoute component={TeacherResults} role="teacher" />}</Route>
+      <Route path="/student">{() => <ProtectedRoute component={StudentDashboard} role="student" />}</Route>
+      <Route path="/student/homework">{() => <ProtectedRoute component={StudentHomework} role="student" />}</Route>
+      <Route path="/student/notes">{() => <ProtectedRoute component={StudentNotes} role="student" />}</Route>
+      <Route path="/student/attendance">{() => <ProtectedRoute component={StudentAttendance} role="student" />}</Route>
+      <Route path="/student/results">{() => <ProtectedRoute component={StudentResults} role="student" />}</Route>
+      <Route path="/student/timetable">{() => <ProtectedRoute component={StudentTimetable} role="student" />}</Route>
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <AuthProvider>
+            <Router />
+          </AuthProvider>
+        </WouterRouter>
+        <Toaster />
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
