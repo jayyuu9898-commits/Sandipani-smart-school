@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { mockTeachers, mockStudents, mockHomework, mockClasses } from "@/data/mockData";
 import { LayoutDashboard, CalendarCheck, BookOpen, FileText, Trophy, Users, Clock, ChevronRight } from "lucide-react";
+import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 
@@ -109,6 +110,7 @@ export default function TeacherDashboard() {
             })}
           </div>
         </div>
+        <Footer />
       </div>
     </MobileLayout>
   );

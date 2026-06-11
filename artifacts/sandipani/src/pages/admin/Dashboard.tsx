@@ -2,8 +2,9 @@ import { useAuth } from "@/context/AuthContext";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { Footer } from "@/components/layout/Footer";
 import { mockStudents, mockTeachers, mockClasses, mockAttendance } from "@/data/mockData";
-import { LayoutDashboard, Users, UserCheck, BookOpen, TrendingUp, CalendarCheck, GraduationCap } from "lucide-react";
+import { LayoutDashboard, Users, UserCheck, BookOpen, TrendingUp, CalendarCheck, GraduationCap, Info } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 
@@ -12,6 +13,7 @@ const navItems = [
   { icon: Users, label: "Students", href: "/admin/students" },
   { icon: UserCheck, label: "Teachers", href: "/admin/teachers" },
   { icon: BookOpen, label: "Classes", href: "/admin/classes" },
+  { icon: Info, label: "About", href: "/about" },
 ];
 
 const today = new Date().toISOString().split("T")[0];
@@ -30,7 +32,7 @@ const quickActions = [
   { label: "Manage Students", href: "/admin/students", icon: Users, color: "from-blue-500 to-blue-600" },
   { label: "Manage Teachers", href: "/admin/teachers", icon: UserCheck, color: "from-emerald-500 to-emerald-600" },
   { label: "Manage Classes", href: "/admin/classes", icon: BookOpen, color: "from-violet-500 to-violet-600" },
-  { label: "View Reports", href: "/admin", icon: TrendingUp, color: "from-amber-500 to-amber-600" },
+  { label: "About Developer", href: "/about", icon: Info, color: "from-indigo-500 to-indigo-600" },
 ];
 
 export default function AdminDashboard() {
@@ -39,10 +41,7 @@ export default function AdminDashboard() {
   const greeting = now.getHours() < 12 ? "Good morning" : now.getHours() < 17 ? "Good afternoon" : "Good evening";
 
   return (
-    <MobileLayout
-      header={<Header />}
-      bottomNav={<BottomNav items={navItems} />}
-    >
+    <MobileLayout header={<Header />} bottomNav={<BottomNav items={navItems} />}>
       <div className="p-4 space-y-5">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
           <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-5 text-white shadow-lg">
@@ -67,13 +66,8 @@ export default function AdminDashboard() {
             {statCards.map((card, i) => {
               const Icon = card.icon;
               return (
-                <motion.div
-                  key={card.label}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.07 }}
-                  className={`bg-white rounded-2xl p-4 border ${card.border} shadow-sm`}
-                >
+                <motion.div key={card.label} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.07 }}
+                  className={`bg-white rounded-2xl p-4 border ${card.border} shadow-sm`}>
                   <div className={`w-10 h-10 rounded-xl ${card.color} flex items-center justify-center mb-3`}>
                     <Icon size={20} />
                   </div>
@@ -91,12 +85,7 @@ export default function AdminDashboard() {
             {quickActions.map((action, i) => {
               const Icon = action.icon;
               return (
-                <motion.div
-                  key={action.label}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.28 + i * 0.07 }}
-                >
+                <motion.div key={action.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28 + i * 0.07 }}>
                   <Link href={action.href}>
                     <div className={`bg-gradient-to-br ${action.color} rounded-2xl p-4 text-white shadow-sm active:scale-95 transition-transform cursor-pointer`}>
                       <Icon size={24} className="mb-2" />
@@ -113,19 +102,14 @@ export default function AdminDashboard() {
           <h3 className="text-sm font-semibold text-muted-foreground mb-3 px-1">Recent Activity</h3>
           <div className="bg-white rounded-2xl border border-border shadow-sm divide-y divide-border">
             {[
-              { text: "New student Rishabh Pant enrolled in Class 10C", time: "2m ago", icon: "📋" },
-              { text: "Anjali Sharma marked attendance for Class 8A", time: "1h ago", icon: "✓" },
-              { text: "Homework uploaded for Class 9B – Science", time: "3h ago", icon: "📂" },
-              { text: "Mid Term results published for Class 8A", time: "Yesterday", icon: "📊" },
+              { text: "New student Rishabh Pant enrolled in Class 10C", time: "2m ago" },
+              { text: "Anjali Sharma marked attendance for Class 8A", time: "1h ago" },
+              { text: "Homework uploaded for Class 9B – Science", time: "3h ago" },
+              { text: "Mid Term results published for Class 8A", time: "Yesterday" },
             ].map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 + i * 0.05 }}
-                className="flex items-start gap-3 p-3"
-              >
-                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-sm flex-shrink-0">
+              <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 + i * 0.05 }}
+                className="flex items-start gap-3 p-3">
+                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <TrendingUp size={14} className="text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -136,6 +120,8 @@ export default function AdminDashboard() {
             ))}
           </div>
         </div>
+
+        <Footer />
       </div>
     </MobileLayout>
   );
