@@ -1,0 +1,1 @@
+- [Sandipani DB & API foundation](sandipani-db-api.md) — BATCH 1 complete: real PostgreSQL DB, CRUD API for students/teachers/classes, auto-ID format STU-2026-001/TCH-2026-001/CLS-08-A.
