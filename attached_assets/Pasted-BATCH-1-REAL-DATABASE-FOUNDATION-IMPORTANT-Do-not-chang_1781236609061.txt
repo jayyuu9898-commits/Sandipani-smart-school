@@ -1,0 +1,238 @@
+BATCH 1 – REAL DATABASE FOUNDATION
+
+IMPORTANT:
+
+Do not change UI design.
+
+Do not remove any dashboard.
+
+Do not remove login system.
+
+Do not remove navigation.
+
+Do not remove About Developer page.
+
+Only convert the application from demo/mock data to a real persistent database system.
+
+====================================
+
+GOAL
+
+Replace all demo/mock data with real database storage.
+
+All data must remain saved permanently.
+
+Data must NOT disappear after:
+
+- Refresh
+- Logout
+- Browser Close
+- Server Restart
+- Re-deploy
+
+====================================
+
+DATABASE
+
+Create a proper backend database structure.
+
+Store permanently:
+
+- Students
+- Teachers
+- Classes
+- Subjects
+- Homework
+- Notes
+
+Use a production-ready database architecture.
+
+====================================
+
+STUDENT MANAGEMENT
+
+Admin can:
+
+- Add Student
+- Edit Student
+- Delete Student
+- View Student
+- Search Student
+
+Student Fields:
+
+- Student ID (Auto Generated)
+- Full Name
+- Roll Number
+- Class
+- Section
+- Stream
+- Additional Subject
+- Gender
+- Date Of Birth
+- Parent Name
+- Parent Mobile
+- Address
+
+Student ID Format:
+
+STU-2026-001
+STU-2026-002
+STU-2026-003
+
+Auto increment IDs.
+
+====================================
+
+TEACHER MANAGEMENT
+
+Admin can:
+
+- Add Teacher
+- Edit Teacher
+- Delete Teacher
+- Search Teacher
+- View Teacher Profile
+
+Fields:
+
+- Teacher ID
+- Full Name
+- Subject
+- Mobile Number
+- Email
+- Assigned Classes
+
+Teacher ID Format:
+
+TCH-2026-001
+TCH-2026-002
+
+Auto increment IDs.
+
+====================================
+
+CLASS MANAGEMENT
+
+Store permanently:
+
+Class 1 to Class 12
+
+Sections:
+
+A
+B
+C
+D
+
+Admin can:
+
+- Add Class
+- Edit Class
+- Delete Class
+
+====================================
+
+ACADEMIC STRUCTURE
+
+Classes 1–8:
+
+Hindi
+English
+Mathematics
+Science
+Social Science
+
+Classes 9–10:
+
+Hindi
+English
+Mathematics
+Science
+Social Science
+
+Additional Subject:
+
+Sanskrit
+Retail
+Health Care
+
+====================================
+
+CLASS 11–12 STREAMS
+
+Arts
+
+Commerce
+
+Maths Science
+
+Bio Science
+
+Agriculture
+
+Automatically assign subjects based on stream.
+
+====================================
+
+SEARCH SYSTEM
+
+Student Search:
+
+- Name
+- Student ID
+- Class
+- Section
+
+Teacher Search:
+
+- Name
+- Teacher ID
+- Subject
+
+====================================
+
+VALIDATION
+
+Prevent duplicate IDs.
+
+Prevent empty required fields.
+
+Show success messages.
+
+Show error messages.
+
+====================================
+
+TESTING
+
+After implementation:
+
+Create sample records.
+
+Verify:
+
+- Add Student works
+- Edit Student works
+- Delete Student works
+- Add Teacher works
+- Edit Teacher works
+- Delete Teacher works
+
+Verify all data remains saved after refresh and restart.
+
+====================================
+
+IMPORTANT
+
+Keep current design.
+
+Keep current landing page.
+
+Keep current About Developer page.
+
+Keep login system working.
+
+Do not break any existing functionality.
+
+Only upgrade the application from demo storage to a real persistent database system.
