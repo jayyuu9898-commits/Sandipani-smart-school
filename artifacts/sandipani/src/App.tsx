@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import NotFound from "@/pages/not-found";
+import Landing from "@/pages/landing";
 import Splash from "@/pages/splash";
 import Login from "@/pages/login";
 import AboutPage from "@/pages/about";
@@ -36,7 +37,8 @@ function Router() {
   const { user } = useAuth();
   return (
     <Switch>
-      <Route path="/" component={Splash} />
+      <Route path="/" component={Landing} />
+      <Route path="/splash" component={Splash} />
       <Route path="/login" component={Login} />
       <Route path="/about">{() => user ? <AboutPage /> : <Redirect to="/login" />}</Route>
       <Route path="/admin">{() => <ProtectedRoute component={AdminDashboard} role="admin" />}</Route>

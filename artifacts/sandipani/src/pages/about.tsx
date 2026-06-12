@@ -3,9 +3,8 @@ import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Footer } from "@/components/layout/Footer";
-import { LayoutDashboard, Users, UserCheck, BookOpen, GraduationCap, Code2, Info, Calendar, Tag, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Users, UserCheck, BookOpen, GraduationCap, Code2, Info, Calendar, Tag } from "lucide-react";
 import { motion } from "framer-motion";
-import { Link } from "wouter";
 
 const adminNav = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
@@ -17,12 +16,12 @@ const adminNav = [
 
 const teacherNav = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/teacher" },
-  { icon: ArrowLeft, label: "Back", href: "/teacher" },
+  { icon: BookOpen, label: "Homework", href: "/teacher/homework" },
 ];
 
 const studentNav = [
   { icon: LayoutDashboard, label: "Home", href: "/student" },
-  { icon: ArrowLeft, label: "Back", href: "/student" },
+  { icon: BookOpen, label: "Homework", href: "/student/homework" },
 ];
 
 const details = [
@@ -30,7 +29,7 @@ const details = [
   { icon: Code2, label: "Developer", value: "Jay Soni" },
   { icon: BookOpen, label: "Class", value: "12th Science" },
   { icon: Tag, label: "Version", value: "1.0" },
-  { icon: Calendar, label: "Year", value: "2025" },
+  { icon: Calendar, label: "Academic Session", value: "2026-27" },
 ];
 
 export default function AboutPage() {
@@ -39,32 +38,34 @@ export default function AboutPage() {
   const navItems =
     user?.role === "admin" ? adminNav :
     user?.role === "teacher" ? teacherNav :
-    user?.role === "student" ? studentNav : [];
+    studentNav;
 
   return (
-    <MobileLayout header={<Header title="About Developer" />} bottomNav={navItems.length > 0 ? <BottomNav items={navItems} /> : undefined}>
+    <MobileLayout header={<Header title="About Developer" />} bottomNav={<BottomNav items={navItems} />}>
       <div className="p-4 space-y-5">
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-6 text-white text-center shadow-lg">
+          <div className="bg-gradient-to-br from-primary to-indigo-700 rounded-3xl p-6 text-white text-center shadow-lg">
             <div className="w-20 h-20 rounded-full bg-white/20 border-4 border-white/30 flex items-center justify-center mx-auto mb-4 shadow-inner">
               <span className="text-3xl font-black text-white">JS</span>
             </div>
-            <h2 className="text-2xl font-bold">Jay Soni</h2>
-            <p className="text-white/80 text-sm mt-1">Class 12th Science Student</p>
-            <div className="mt-3 inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1">
-              <Code2 size={12} className="text-white" />
-              <span className="text-xs text-white font-medium">Full Stack Developer</span>
-            </div>
+            <p className="text-white/70 text-xs font-medium uppercase tracking-widest mb-1">Founder &amp; Developer</p>
+            <h2 className="text-2xl font-black">Jay Soni</h2>
+            <p className="text-white/80 text-sm mt-1">Class 12th Science</p>
+            <p className="text-white/60 text-xs mt-0.5">Academic Session: 2026-27</p>
           </div>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl border border-border p-4 shadow-sm">
-          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-            <Info size={14} className="text-primary" /> About This App
-          </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            This application was designed and developed by Jay Soni, a Class 12th Science student, to help students, teachers and parents manage school activities efficiently through a modern digital platform.
+          className="bg-gradient-to-br from-indigo-50 to-primary/5 border border-primary/10 rounded-2xl p-4">
+          <p className="text-[10px] text-primary font-bold uppercase tracking-wider mb-3">Message from the Developer</p>
+          <p className="text-sm text-foreground leading-relaxed italic">
+            "This project was created to make school education smarter, simpler, and more accessible through technology.
+          </p>
+          <p className="text-sm text-foreground leading-relaxed italic mt-2">
+            My vision is to help students, teachers, and parents connect through a modern digital platform that improves learning, communication, and school management.
+          </p>
+          <p className="text-sm text-foreground leading-relaxed italic mt-2">
+            Sandipani Smart School is not just an application, but a step toward a smarter future of education."
           </p>
         </motion.div>
 
@@ -90,7 +91,7 @@ export default function AboutPage() {
           })}
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
           className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-blue-100 rounded-2xl p-4">
           <h3 className="text-sm font-bold text-indigo-700 mb-2">Features Built</h3>
           <div className="grid grid-cols-2 gap-2">
@@ -103,10 +104,10 @@ export default function AboutPage() {
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
           className="bg-white rounded-2xl border border-border p-4 text-center shadow-sm">
-          <p className="text-xs text-muted-foreground">Built with</p>
-          <div className="flex flex-wrap gap-2 justify-center mt-2">
+          <p className="text-xs text-muted-foreground mb-2">Built with</p>
+          <div className="flex flex-wrap gap-2 justify-center">
             {["React", "TypeScript", "Vite", "Tailwind CSS", "Framer Motion", "Wouter", "shadcn/ui"].map(t => (
               <span key={t} className="text-[10px] bg-primary/10 text-primary font-medium px-2 py-1 rounded-full">{t}</span>
             ))}

@@ -1,0 +1,184 @@
+UPGRADE THE PUBLIC LANDING PAGE OF SANDIPANI SMART SCHOOL
+IMPORTANT: Do not remove any existing functionality, login system, dashboards, or navigation. Only improve and redesign the public landing page professionally.
+===================================== GOAL
+The public landing page should create a strong first impression.
+When a visitor opens the app, they should immediately feel:
+"This school has a modern digital platform. Login karke aur bhi powerful features milenge."
+The public area should work like a professional school website and app showcase.
+===================================== HERO SECTION
+Display:
+Sandipani Smart School
+Tagline:
+"Learning Today, Leading Tomorrow"
+Subtitle:
+A Smart Digital School Platform for Students, Teachers and Parents.
+Add:
+School Logo
+School Building Image
+Professional Background
+Mobile Friendly Design
+Buttons:
+Student Login
+Teacher Login
+Explore Features
+===================================== WELCOME SECTION
+Welcome visitors with a professional message explaining:
+Digital Learning
+Smart School Management
+Student Success
+Teacher Efficiency
+===================================== LATEST NOTICES
+Create a Public Notice Board.
+Examples:
+Admission Open
+School Holidays
+Upcoming Events
+Examination Updates
+Display in attractive cards.
+===================================== WHY CHOOSE SANDIPANI SMART SCHOOL
+Show feature cards:
+Smart Learning
+Digital Homework
+Attendance Tracking
+Academic Progress
+Resource Library
+Mobile Friendly Access
+Secure Platform
+Future AI Learning Support
+===================================== INSIDE THE DIGITAL CAMPUS
+Create a section called:
+"Inside Sandipani Smart School"
+Show preview cards for:
+Homework Management
+Attendance Tracking
+Timetable
+Results & Report Cards
+Digital Notes Library
+Student Progress Tracking
+Notifications
+Study Resources
+On each card display:
+"Available After Login"
+This should encourage visitors to login.
+===================================== STUDENT BENEFITS
+Display cards:
+Homework Access
+Study Notes
+Attendance Monitoring
+Results Tracking
+Digital Learning Resources
+Future AI Study Assistant
+===================================== TEACHER BENEFITS
+Display cards:
+Homework Upload
+Notes Sharing
+Attendance Management
+Result Management
+Academic Monitoring
+===================================== PARENT BENEFITS
+Display cards:
+Attendance Monitoring
+Result Tracking
+Homework Updates
+School Notices
+Academic Progress Tracking
+===================================== FUTURE AI FEATURES
+Create a premium section:
+"Future AI Learning System"
+Display:
+AI Study Assistant
+AI Homework Helper
+AI Quiz Generator
+AI Notes Explainer
+AI Learning Analytics
+AI Weak Topic Detection
+AI Personalized Practice
+Display badge:
+"Coming Soon"
+===================================== SCHOOL GALLERY
+Create a Gallery Section.
+Include placeholders for:
+School Building
+Classrooms
+Science Lab
+Library
+Sports Activities
+Annual Functions
+Cultural Events
+===================================== EVENTS & CALENDAR
+Display:
+Upcoming Events
+School Programs
+Examination Schedule
+Holiday Calendar
+===================================== ACHIEVEMENTS SECTION
+Display:
+Academic Achievements
+Sports Achievements
+School Activities
+Student Success Stories
+===================================== ADMISSION SECTION
+Create:
+Admission Inquiry Form
+Fields:
+Student Name
+Parent Name
+Mobile Number
+Interested Class
+Message
+Save inquiries for Admin review.
+===================================== DEVELOPER SECTION
+Create a professional card:
+Founder & Developer
+Jay Soni
+Class: 12th Science
+Academic Session: 2026-27
+Display circular profile image.
+If image unavailable, show placeholder avatar.
+Text:
+"Designed and Developed by Jay Soni with the vision of bringing smart digital education and school management solutions to students, teachers and parents."
+===================================== FUTURE ROADMAP
+Display timeline:
+✓ Public School Portal
+✓ Student Dashboard
+✓ Teacher Dashboard
+✓ Homework Management
+✓ Notes Management
+✓ Attendance System
+✓ Results System
+✓ Excel Import
+✓ Parent Portal
+✓ AI Study Assistant
+✓ AI Quiz Generator
+✓ Smart School Analytics
+===================================== CALL TO ACTION
+Display:
+"Join the Digital Learning Experience"
+Buttons:
+Student Login
+Teacher Login
+===================================== FOOTER
+Sandipani Smart School © 2026
+Developed by Jay Soni | Class 12th Science
+Version 1.0
+Links:
+Home
+About School
+About Developer
+Contact
+Login
+===================================== DESIGN REQUIREMENTS
+Mobile First
+Premium Design
+Modern School Theme
+Smooth Animations
+Professional Cards
+Fast Loading
+Responsive Layout
+Clean Typography
+Attractive Color Scheme
+IMPORTANT:
+Do not show any Admin Panel data publicly.
+Do not show student marks, attendance, passwords or private information.
+Only showcase features and benefits publicly.
+The landing page should make visitors excited to login and explore the platform. :::
