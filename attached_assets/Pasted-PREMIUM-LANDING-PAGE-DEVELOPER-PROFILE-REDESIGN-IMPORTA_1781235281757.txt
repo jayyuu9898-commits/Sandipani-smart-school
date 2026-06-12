@@ -1,0 +1,321 @@
+PREMIUM LANDING PAGE + DEVELOPER PROFILE REDESIGN
+
+IMPORTANT:
+
+Do not remove any existing functionality.
+
+Do not remove login system.
+
+Do not remove dashboards.
+
+Do not remove current pages.
+
+Only improve design, structure and user experience.
+
+====================================
+
+GOAL
+
+Transform Sandipani Smart School into a premium modern school ERP and digital learning platform.
+
+The website should feel professional, trustworthy, inspiring and modern.
+
+====================================
+
+DEVELOPER PHOTO
+
+Use the uploaded developer photo provided by the project owner.
+
+Display this real photo on the About Developer page.
+
+Requirements:
+
+- Circular profile image
+- Professional frame
+- Soft shadow
+- Responsive on mobile
+- High quality display
+- Center aligned
+
+If image is unavailable then show placeholder avatar.
+
+====================================
+
+HEADER
+
+Create a professional sticky navigation bar.
+
+Logo + School Name
+
+Menu:
+
+Home
+
+Features
+
+Gallery
+
+Announcements
+
+About Developer
+
+Contact
+
+Buttons:
+
+Student Login
+
+Teacher Login
+
+Admin Login
+
+Mobile:
+
+Hamburger Menu
+
+====================================
+
+HERO SECTION
+
+Large premium hero section.
+
+Title:
+
+Sandipani Smart School
+
+Tagline:
+
+Learning Today, Leading Tomorrow
+
+Subtitle:
+
+A Smart Digital School Platform for Students, Teachers, Parents and Administrators.
+
+Buttons:
+
+Student Login
+
+Teacher Login
+
+Explore Features
+
+Add:
+
+Professional School Illustration
+
+Modern Gradient Background
+
+Floating Shapes
+
+Smooth Animations
+
+====================================
+
+FEATURES SECTION
+
+Premium feature cards.
+
+Display:
+
+Smart Learning
+
+Digital Homework
+
+Attendance Tracking
+
+Results & Report Cards
+
+Study Notes
+
+Notifications
+
+Timetable
+
+AI Learning Support
+
+Use:
+
+Icons
+
+Shadows
+
+Animations
+
+Responsive Grid
+
+====================================
+
+GALLERY SECTION
+
+Professional school gallery.
+
+Create image grid layout.
+
+Categories:
+
+School Campus
+
+Classrooms
+
+Science Lab
+
+Library
+
+Sports
+
+Events
+
+Image preview popup support.
+
+====================================
+
+ANNOUNCEMENTS SECTION
+
+Modern notice board.
+
+Recent announcements.
+
+Upcoming events.
+
+Exam updates.
+
+Admissions.
+
+Scholarship notices.
+
+====================================
+
+ABOUT DEVELOPER PAGE
+
+Create a dedicated premium page.
+
+Title:
+
+About Developer
+
+Display:
+
+Founder & Developer
+
+Jay Soni
+
+Class 12th Science
+
+Academic Session 2026-27
+
+Release Year:
+2026
+
+Version:
+1.0
+
+Platform:
+School Management & Smart Learning System
+
+====================================
+
+DEVELOPER MESSAGE
+
+Display:
+
+"Sandipani Smart School was created with the vision of making education smarter, more accessible and technology-driven.
+
+This project was designed and developed by Jay Soni, a Class 12th Science student, to help schools manage academics, communication and learning through one modern platform.
+
+The goal is to create a digital ecosystem where students, teachers and parents can stay connected and improve learning outcomes."
+
+====================================
+
+VISION
+
+To create a smart, accessible and technology-driven education platform that helps students learn better, teachers manage efficiently, and schools operate digitally.
+
+====================================
+
+MISSION
+
+To provide an easy-to-use digital ecosystem for school management, academic tracking, communication and AI-assisted learning.
+
+====================================
+
+FUTURE ROADMAP
+
+✓ Homework Management
+
+✓ Notes & Study Material
+
+✓ Attendance Tracking
+
+✓ Results & Progress Reports
+
+✓ Parent Portal
+
+✓ AI Study Assistant
+
+✓ AI Quiz Generator
+
+✓ PDF Learning Assistant
+
+✓ Smart Analytics
+
+✓ School Mobile App
+
+====================================
+
+TECHNOLOGY SECTION
+
+Built Using:
+
+Replit
+
+GitHub
+
+Modern Web Technologies
+
+====================================
+
+FOOTER
+
+Sandipani Smart School © 2026
+
+Developed by Jay Soni | Class 12th Science
+
+Version 1.0
+
+====================================
+
+UI REQUIREMENTS
+
+Premium Design
+
+Dark Blue + Royal Blue Theme
+
+Gold Accent Colors
+
+Professional Cards
+
+Smooth Animations
+
+Mobile First Design
+
+Responsive Layout
+
+Modern Typography
+
+Soft Shadows
+
+Professional User Experience
+
+====================================
+
+IMPORTANT
+
+Keep all current functionality working.
+
+Do not break login system.
+
+Do not remove dashboards.
+
+Do not remove existing features.
+
+Only upgrade design and user experience.

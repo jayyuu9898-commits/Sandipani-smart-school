@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 import {
   GraduationCap, BookOpen, CalendarCheck, Trophy, FileText, Bell,
   Users, UserCheck, Brain, Sparkles, Star, CheckCircle2, ChevronRight,
-  Building2, FlaskConical, Library, Dumbbell, Music, Camera,
-  MessageSquare, Shield, Smartphone, Zap, ArrowRight, Code2,
-  ClipboardList, BarChart3, Clock, Send, MapPin, Phone, Mail,
+  Building2, FlaskConical, Library, Dumbbell, Music,
+  Shield, Smartphone, Zap, Code2,
+  ClipboardList, BarChart3, Clock, Send,
   Lightbulb, Target, Rocket, Bot, Cpu
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { LandingHeader } from "@/components/layout/LandingHeader";
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
@@ -145,9 +146,10 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <LandingHeader />
 
       {/* ── HERO ── */}
-      <section className="relative bg-gradient-to-br from-primary via-primary/90 to-indigo-700 text-white overflow-hidden">
+      <section id="hero" className="relative bg-gradient-to-br from-[#0d1b4b] via-primary to-indigo-700 text-white overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.1),transparent_60%)]" />
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-background rounded-t-[2.5rem]" />
         <div className="relative px-5 pt-14 pb-24 text-center max-w-lg mx-auto">
@@ -210,7 +212,7 @@ export default function Landing() {
       </section>
 
       {/* ── LATEST NOTICES ── */}
-      <section className="px-5 pb-10 max-w-lg mx-auto">
+      <section id="notices" className="px-5 pb-10 max-w-lg mx-auto">
         <motion.div {...fadeUp()}>
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -235,7 +237,7 @@ export default function Landing() {
       </section>
 
       {/* ── WHY CHOOSE US ── */}
-      <section id="features" className="bg-muted/40 px-5 py-10 max-w-lg mx-auto rounded-none">
+      <section id="features" className="bg-muted/40 px-5 py-10 max-w-full">
         <motion.div {...fadeUp()}>
           <Badge className="mb-3 bg-primary/10 text-primary hover:bg-primary/10">Why Us</Badge>
           <h2 className="text-xl font-black mb-5">Why Choose Sandipani Smart School?</h2>
@@ -350,7 +352,7 @@ export default function Landing() {
       </section>
 
       {/* ── GALLERY ── */}
-      <section className="bg-muted/40 px-5 py-10 max-w-lg mx-auto">
+      <section id="gallery" className="bg-muted/40 px-5 py-10 max-w-lg mx-auto">
         <motion.div {...fadeUp()}>
           <Badge className="mb-3 bg-amber-100 text-amber-700 hover:bg-amber-100">Gallery</Badge>
           <h2 className="text-xl font-black mb-5">School Gallery</h2>
@@ -457,7 +459,7 @@ export default function Landing() {
       </section>
 
       {/* ── DEVELOPER SECTION ── */}
-      <section className="bg-gradient-to-br from-primary/5 to-indigo-50 px-5 py-10 max-w-lg mx-auto">
+      <section id="contact" className="bg-gradient-to-br from-primary/5 to-indigo-50 px-5 py-10 max-w-lg mx-auto">
         <motion.div {...fadeUp()}>
           <Badge className="mb-3 bg-indigo-100 text-indigo-700 hover:bg-indigo-100">Team</Badge>
           <h2 className="text-xl font-black mb-5">Founder & Developer</h2>

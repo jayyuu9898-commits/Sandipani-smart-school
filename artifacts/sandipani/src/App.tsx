@@ -40,7 +40,7 @@ function Router() {
       <Route path="/" component={Landing} />
       <Route path="/splash" component={Splash} />
       <Route path="/login" component={Login} />
-      <Route path="/about">{() => user ? <AboutPage /> : <Redirect to="/login" />}</Route>
+      <Route path="/about" component={AboutPage} />
       <Route path="/admin">{() => <ProtectedRoute component={AdminDashboard} role="admin" />}</Route>
       <Route path="/admin/students">{() => <ProtectedRoute component={AdminStudents} role="admin" />}</Route>
       <Route path="/admin/teachers">{() => <ProtectedRoute component={AdminTeachers} role="admin" />}</Route>
