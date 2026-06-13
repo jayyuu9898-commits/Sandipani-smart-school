@@ -196,4 +196,4 @@ export const mockTimetable: TimetableEntry[] = [
   { day: "Thursday", period: 1, subject: "History", teacherName: "Ramesh Iyer", time: "08:00 - 08:45" },
   { day: "Friday", period: 1, subject: "Geography", teacherName: "Kavita Rao", time: "08:00 - 08:45" },
   { day: "Saturday", period: 1, subject: "Mathematics", teacherName: "Anjali Sharma", time: "08:00 - 08:45" },
-];.ts
+];
