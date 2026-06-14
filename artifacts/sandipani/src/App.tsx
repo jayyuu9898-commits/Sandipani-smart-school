@@ -12,6 +12,9 @@ import AdminDashboard from "@/pages/admin/Dashboard";
 import AdminStudents from "@/pages/admin/Students";
 import AdminTeachers from "@/pages/admin/Teachers";
 import AdminClasses from "@/pages/admin/Classes";
+import AdminSettings from "@/pages/admin/Settings";
+import AdminNotices from "@/pages/admin/Notices";
+import AdminTimetable from "@/pages/admin/Timetable";
 import TeacherDashboard from "@/pages/teacher/Dashboard";
 import TeacherAttendance from "@/pages/teacher/Attendance";
 import TeacherHomework from "@/pages/teacher/Homework";
@@ -23,6 +26,7 @@ import StudentNotes from "@/pages/student/Notes";
 import StudentAttendance from "@/pages/student/Attendance";
 import StudentResults from "@/pages/student/Results";
 import StudentTimetable from "@/pages/student/Timetable";
+import StudentProfile from "@/pages/student/Profile";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +49,9 @@ function Router() {
       <Route path="/admin/students">{() => <ProtectedRoute component={AdminStudents} role="admin" />}</Route>
       <Route path="/admin/teachers">{() => <ProtectedRoute component={AdminTeachers} role="admin" />}</Route>
       <Route path="/admin/classes">{() => <ProtectedRoute component={AdminClasses} role="admin" />}</Route>
+      <Route path="/admin/settings">{() => <ProtectedRoute component={AdminSettings} role="admin" />}</Route>
+      <Route path="/admin/notices">{() => <ProtectedRoute component={AdminNotices} role="admin" />}</Route>
+      <Route path="/admin/timetable">{() => <ProtectedRoute component={AdminTimetable} role="admin" />}</Route>
       <Route path="/teacher">{() => <ProtectedRoute component={TeacherDashboard} role="teacher" />}</Route>
       <Route path="/teacher/attendance">{() => <ProtectedRoute component={TeacherAttendance} role="teacher" />}</Route>
       <Route path="/teacher/homework">{() => <ProtectedRoute component={TeacherHomework} role="teacher" />}</Route>
@@ -56,6 +63,7 @@ function Router() {
       <Route path="/student/attendance">{() => <ProtectedRoute component={StudentAttendance} role="student" />}</Route>
       <Route path="/student/results">{() => <ProtectedRoute component={StudentResults} role="student" />}</Route>
       <Route path="/student/timetable">{() => <ProtectedRoute component={StudentTimetable} role="student" />}</Route>
+      <Route path="/student/profile">{() => <ProtectedRoute component={StudentProfile} role="student" />}</Route>
       <Route component={NotFound} />
     </Switch>
   );
