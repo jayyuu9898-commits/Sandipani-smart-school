@@ -1,8 +1,9 @@
-import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/landing";
 import Splash from "@/pages/splash";
@@ -31,17 +32,9 @@ import StudentProfile from "@/pages/student/Profile";
 
 const queryClient = new QueryClient();
 
-function ProtectedRoute({ component: Component, role }: { component: React.ComponentType; role?: string }) {
-  const { user, loading } = useAuth();
-  if (loading) return null;
-  if (!user) return <Redirect to="/login" />;
-  if (role && user.role !== role) return <Redirect to="/login" />;
-  return <Component />;
-}
-
 function Router() {
-  const { user, loading } = useAuth();
-  if (loading) return null;
+  const { loading } = useAuth();
+  if (loading) return <Splash />;
   return (
     <Switch>
       <Route path="/" component={Landing} />
