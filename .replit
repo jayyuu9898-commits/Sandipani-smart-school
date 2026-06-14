@@ -1,5 +1,8 @@
 modules = ["nodejs-24"]
 
+[build]
+build = "npm run build"
+
 [deployment]
 router = "application"
 deploymentTarget = "autoscale"
@@ -7,6 +10,9 @@ deploymentTarget = "autoscale"
 [deployment.postBuild]
 args = ["pnpm", "store", "prune"]
 env = { "CI" = "true" }
+
+[env]
+PORT = "3000"
 
 [workflows]
 runButton = "Project"
@@ -20,21 +26,16 @@ path = "scripts/post-merge.sh"
 timeoutMs = 20000
 
 [[ports]]
-localPort = 8080
-externalPort = 8080
-
-[[ports]]
-localPort = 8081
+localPort = 3000
 externalPort = 80
+description = "API Server"
 
 [[ports]]
-localPort = 8082
-externalPort = 3001
+localPort = 5173
+externalPort = 8080
+description = "Frontend Dev"
 
 [[ports]]
 localPort = 8083
-externalPort = 3002
-
-[[ports]]
-localPort = 23367
-externalPort = 3000
+externalPort = 3001
+description = "Supabase"

@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { mockResults, mockStudents } from "@/data/mockData";
-import { LayoutDashboard, BookOpen, FileText, CalendarCheck, Trophy } from "lucide-react";
+import { LayoutDashboard, BookOpen, FileText, CalendarCheck, Trophy, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useAuth } from "@/context/AuthContext";
 import { Badge } from "@/components/ui/badge";
 
 const navItems = [
@@ -35,29 +35,79 @@ const subjectColors: Record<string, string> = {
 
 export default function StudentResults() {
   const { user } = useAuth();
-  const student = mockStudents.find(s => s.name === user?.name) ?? mockStudents[0];
-  const myResults = mockResults.filter(r => r.studentId === student.id);
+  const [loading, setLoading] = useState(true);
+  const [results, setResults] = useState<any[]>([]);
+  const [examTypes, setExamTypes] = useState<string[]>([]);
+  const [selectedExam, setSelectedExam] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  const examTypes = [...new Set(myResults.map(r => r.examType))];
-  const [selectedExam, setSelectedExam] = useState(examTypes[0] ?? "");
+  useEffect(() => {
+    if (!user?.id) return;
 
-  const filtered = myResults.filter(r => r.examType === selectedExam);
-  const avgPct = filtered.length > 0 ? Math.round(filtered.reduce((acc, r) => acc + (r.marks / r.totalMarks) * 100, 0) / filtered.length) : 0;
-  const totalMarks = filtered.reduce((acc, r) => acc + r.marks, 0);
-  const maxMarks = filtered.reduce((acc, r) => acc + r.totalMarks, 0);
+    const fetchResults = async () => {
+      try {
+        setError(null);
+
+        // Get exam results for student
+        const { data: resultData, error: resErr } = await supabase
+          .from("exam_results")
+          .select("id, exam_type, subject, marks_obtained, max_marks, grade")
+          .eq("student_id", user.id)
+          .order("exam_type");
+
+        if (resErr) throw resErr;
+
+        const data = resultData || [];
+        const types = [...new Set(data.map(r => r.exam_type))];
+        
+        setResults(data);
+        setExamTypes(types);
+        setSelectedExam(types[0] || "");
+      } catch (err: any) {
+        console.error("Error fetching results:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResults();
+  }, [user?.id]);
+
+  if (loading) {
+    return (
+      <MobileLayout header={<Header title="My Results" />} bottomNav={<BottomNav items={navItems} />}>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 size={28} className="animate-spin text-primary" />
+        </div>
+      </MobileLayout>
+    );
+  }
+
+  const filtered = results.filter(r => r.exam_type === selectedExam);
+  const avgPct = filtered.length > 0 
+    ? Math.round(filtered.reduce((acc, r) => acc + (r.marks_obtained / r.max_marks) * 100, 0) / filtered.length) 
+    : 0;
+  const totalMarks = filtered.reduce((acc, r) => acc + r.marks_obtained, 0);
+  const maxMarks = filtered.reduce((acc, r) => acc + r.max_marks, 0);
 
   const pctColor = avgPct >= 80 ? "text-emerald-600" : avgPct >= 60 ? "text-blue-600" : avgPct >= 40 ? "text-amber-600" : "text-red-600";
 
   return (
     <MobileLayout header={<Header title="My Results" />} bottomNav={<BottomNav items={navItems} />}>
       <div className="p-4 space-y-4">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+            <p className="text-red-700 text-xs">{error}</p>
+          </div>
+        )}
+
         <div>
           <p className="text-xs text-muted-foreground mb-2">Select Exam</p>
           <div className="flex gap-2 flex-wrap">
             {examTypes.map(exam => (
               <button key={exam} onClick={() => setSelectedExam(exam)}
                 className={`px-3 py-1.5 rounded-xl text-sm font-medium transition-all ${selectedExam === exam ? "bg-primary text-white shadow-sm" : "bg-white border border-border text-muted-foreground"}`}
-                data-testid={`button-exam-${exam.replace(/\s+/g, "-").toLowerCase()}`}
               >
                 {exam}
               </button>
@@ -84,13 +134,12 @@ export default function StudentResults() {
 
         <div className="space-y-2">
           {filtered.map((result, i) => {
-            const pct = Math.round((result.marks / result.totalMarks) * 100);
+            const pct = Math.round((result.marks_obtained / result.max_marks) * 100);
             const grade = gradeConfig[result.grade] ?? { bg: "bg-gray-100", text: "text-gray-700" };
             const barColor = subjectColors[result.subject] ?? "bg-primary";
             return (
               <motion.div key={result.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                 className="bg-white rounded-2xl border border-border p-4 shadow-sm"
-                data-testid={`card-result-${result.id}`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <p className="font-semibold text-sm">{result.subject}</p>
@@ -100,7 +149,7 @@ export default function StudentResults() {
                   <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                     <div className={`h-2 rounded-full ${barColor}`} style={{ width: `${pct}%` }} />
                   </div>
-                  <span className="text-sm font-semibold text-foreground w-16 text-right">{result.marks}/{result.totalMarks}</span>
+                  <span className="text-sm font-semibold text-foreground w-16 text-right">{result.marks_obtained}/{result.max_marks}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">{pct}% score</p>
               </motion.div>

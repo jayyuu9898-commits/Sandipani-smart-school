@@ -1,9 +1,10 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { mockStudents, mockAttendance, mockHomework, mockResults, mockTimetable } from "@/data/mockData";
-import { LayoutDashboard, BookOpen, FileText, CalendarCheck, Trophy, Clock, ChevronRight, GraduationCap } from "lucide-react";
+import { LayoutDashboard, BookOpen, FileText, CalendarCheck, Trophy, Clock, ChevronRight, GraduationCap, Loader2 } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
@@ -26,22 +27,114 @@ const quickLinks = [
 
 export default function StudentDashboard() {
   const { user } = useAuth();
-  const student = mockStudents.find(s => s.name === user?.name) ?? mockStudents[0];
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ attPct: 0, pendingHw: 0, avgMarks: 0 });
+  const [todayClasses, setTodayClasses] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const myAttendance = mockAttendance.filter(a => a.studentId === student.id);
-  const presentCount = myAttendance.filter(a => a.status === "present").length;
-  const attPct = myAttendance.length > 0 ? Math.round((presentCount / myAttendance.length) * 100) : 0;
+  useEffect(() => {
+    if (!user?.id) return;
 
-  const pendingHw = mockHomework.filter(h => h.classId === student.classId && new Date(h.dueDate) > new Date()).length;
+    const fetchDashboardData = async () => {
+      try {
+        setError(null);
 
-  const myResults = mockResults.filter(r => r.studentId === student.id);
-  const avgMarks = myResults.length > 0 ? Math.round(myResults.reduce((acc, r) => acc + (r.marks / r.totalMarks) * 100, 0) / myResults.length) : 0;
+        // Get student record
+        const { data: studentData, error: stdErr } = await supabase
+          .from("students")
+          .select("id, class_id")
+          .eq("id", user.id)
+          .single();
+
+        if (stdErr) throw stdErr;
+        if (!studentData) throw new Error("Student record not found");
+
+        // Get attendance percentage
+        const { data: attendanceRecords, error: attErr } = await supabase
+          .from("attendance")
+          .select("status")
+          .eq("student_id", user.id);
+
+        if (attErr) throw attErr;
+
+        const presentCount = attendanceRecords?.filter(a => a.status === "present").length || 0;
+        const attPct = attendanceRecords && attendanceRecords.length > 0
+          ? Math.round((presentCount / attendanceRecords.length) * 100)
+          : 0;
+
+        // Get pending homework count
+        const { count: hwCount, error: hwErr } = await supabase
+          .from("homework")
+          .select("*", { count: "exact", head: true })
+          .eq("class_id", studentData.class_id)
+          .gt("due_date", new Date().toISOString());
+
+        if (hwErr) throw hwErr;
+
+        // Get average marks
+        const { data: results, error: resErr } = await supabase
+          .from("exam_results")
+          .select("marks_obtained, max_marks")
+          .eq("student_id", user.id);
+
+        if (resErr) throw resErr;
+
+        let avgMarks = 0;
+        if (results && results.length > 0) {
+          const percentages = results.map(r => (r.marks_obtained / r.max_marks) * 100);
+          avgMarks = Math.round(percentages.reduce((a, b) => a + b, 0) / percentages.length);
+        }
+
+        // Get today's timetable
+        const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        const todayDay = days[new Date().getDay()];
+
+        const { data: timetable, error: ttErr } = await supabase
+          .from("timetables")
+          .select("id, period, subject, start_time, end_time, teachers(full_name)")
+          .eq("class_id", studentData.class_id)
+          .eq("day", todayDay)
+          .order("period");
+
+        if (ttErr) throw ttErr;
+
+        setTodayClasses(
+          (timetable || []).slice(0, 3).map((t: any) => ({
+            subject: t.subject,
+            teacherName: t.teachers?.full_name || "Teacher",
+            time: `${t.start_time} – ${t.end_time}`,
+            period: t.period,
+          }))
+        );
+
+        setStats({
+          attPct,
+          pendingHw: hwCount || 0,
+          avgMarks,
+        });
+      } catch (err: any) {
+        console.error("Error fetching dashboard:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [user?.id]);
+
+  if (loading) {
+    return (
+      <MobileLayout header={<Header />} bottomNav={<BottomNav items={navItems} />}>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 size={28} className="animate-spin text-primary" />
+        </div>
+      </MobileLayout>
+    );
+  }
 
   const now = new Date();
   const greeting = now.getHours() < 12 ? "Good morning" : now.getHours() < 17 ? "Good afternoon" : "Good evening";
-  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const todayDay = days[now.getDay()];
-  const todayClasses = mockTimetable.filter(t => t.day === todayDay).sort((a, b) => a.period - b.period);
 
   const getGradeColor = (pct: number) => {
     if (pct >= 80) return "text-emerald-600";
@@ -53,6 +146,12 @@ export default function StudentDashboard() {
   return (
     <MobileLayout header={<Header />} bottomNav={<BottomNav items={navItems} />}>
       <div className="p-4 space-y-5">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+            <p className="text-red-700 text-xs">{error}</p>
+          </div>
+        )}
+
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-5 text-white shadow-lg">
             <div className="flex items-center gap-3">
@@ -61,7 +160,7 @@ export default function StudentDashboard() {
               </div>
               <div>
                 <p className="text-white/80 text-sm">{greeting},</p>
-                <h2 className="text-xl font-bold">{user?.name}</h2>
+                <h2 className="text-xl font-bold">{user?.fullName}</h2>
               </div>
             </div>
             <p className="text-white/70 text-xs mt-3">
@@ -72,9 +171,9 @@ export default function StudentDashboard() {
 
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: "Attendance", value: `${attPct}%`, icon: CalendarCheck, color: "text-blue-600 bg-blue-50", good: attPct >= 75 },
-            { label: "Pending HW", value: pendingHw, icon: BookOpen, color: "text-violet-600 bg-violet-50", good: pendingHw === 0 },
-            { label: "Avg. Score", value: `${avgMarks}%`, icon: Trophy, color: "text-amber-600 bg-amber-50", good: avgMarks >= 75 },
+            { label: "Attendance", value: `${stats.attPct}%`, icon: CalendarCheck, color: "text-blue-600 bg-blue-50", good: stats.attPct >= 75 },
+            { label: "Pending HW", value: stats.pendingHw, icon: BookOpen, color: "text-violet-600 bg-violet-50", good: stats.pendingHw === 0 },
+            { label: "Avg. Score", value: `${stats.avgMarks}%`, icon: Trophy, color: "text-amber-600 bg-amber-50", good: stats.avgMarks >= 75 },
           ].map((stat, i) => {
             const Icon = stat.icon;
             return (
@@ -97,7 +196,7 @@ export default function StudentDashboard() {
               </Link>
             </div>
             <div className="space-y-2">
-              {todayClasses.slice(0, 3).map((item, i) => (
+              {todayClasses.map((item, i) => (
                 <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + i * 0.06 }}
                   className="bg-white rounded-2xl border border-border p-3 flex items-center gap-3 shadow-sm">
                   <div className="w-1 h-10 bg-primary rounded-full flex-shrink-0" />

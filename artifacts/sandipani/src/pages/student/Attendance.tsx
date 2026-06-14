@@ -1,10 +1,11 @@
+import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { mockAttendance, mockStudents } from "@/data/mockData";
-import { LayoutDashboard, BookOpen, FileText, CalendarCheck, Trophy } from "lucide-react";
+import { LayoutDashboard, BookOpen, FileText, CalendarCheck, Trophy, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -23,30 +24,77 @@ const statusConfig = {
 
 export default function StudentAttendance() {
   const { user } = useAuth();
-  const student = mockStudents.find(s => s.name === user?.name) ?? mockStudents[0];
-  const myAttendance = mockAttendance.filter(a => a.studentId === student.id);
+  const [loading, setLoading] = useState(true);
+  const [records, setRecords] = useState<any[]>([]);
+  const [stats, setStats] = useState({ present: 0, absent: 0, late: 0, pct: 0 });
+  const [error, setError] = useState<string | null>(null);
 
-  const present = myAttendance.filter(a => a.status === "present").length;
-  const absent = myAttendance.filter(a => a.status === "absent").length;
-  const late = myAttendance.filter(a => a.status === "late").length;
-  const total = myAttendance.length;
-  const pct = total > 0 ? Math.round((present / total) * 100) : 0;
+  useEffect(() => {
+    if (!user?.id) return;
 
+    const fetchAttendance = async () => {
+      try {
+        setError(null);
+
+        // Get attendance records for student
+        const { data: attData, error: attErr } = await supabase
+          .from("attendance")
+          .select("id, date, status")
+          .eq("student_id", user.id)
+          .order("date", { ascending: false });
+
+        if (attErr) throw attErr;
+
+        const data = attData || [];
+        const present = data.filter(a => a.status === "present").length;
+        const absent = data.filter(a => a.status === "absent").length;
+        const late = data.filter(a => a.status === "late").length;
+        const total = data.length;
+        const pct = total > 0 ? Math.round((present / total) * 100) : 0;
+
+        setRecords(data);
+        setStats({ present, absent, late, pct });
+      } catch (err: any) {
+        console.error("Error fetching attendance:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAttendance();
+  }, [user?.id]);
+
+  if (loading) {
+    return (
+      <MobileLayout header={<Header title="My Attendance" />} bottomNav={<BottomNav items={navItems} />}>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 size={28} className="animate-spin text-primary" />
+        </div>
+      </MobileLayout>
+    );
+  }
+
+  const { pct } = stats;
   const pctColor = pct >= 75 ? "text-emerald-600" : pct >= 60 ? "text-amber-600" : "text-red-600";
   const progressColor = pct >= 75 ? "bg-emerald-500" : pct >= 60 ? "bg-amber-500" : "bg-red-500";
-
-  const sorted = [...myAttendance].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <MobileLayout header={<Header title="My Attendance" />} bottomNav={<BottomNav items={navItems} />}>
       <div className="p-4 space-y-5">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+            <p className="text-red-700 text-xs">{error}</p>
+          </div>
+        )}
+
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
           className="bg-white rounded-2xl border border-border p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-xs text-muted-foreground">Overall Attendance</p>
               <p className={`text-4xl font-bold mt-1 ${pctColor}`}>{pct}%</p>
-              <p className="text-xs text-muted-foreground mt-1">{total} school days tracked</p>
+              <p className="text-xs text-muted-foreground mt-1">{stats.present + stats.absent + stats.late} school days tracked</p>
             </div>
             <div className="w-20 h-20 relative flex items-center justify-center">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
@@ -73,9 +121,9 @@ export default function StudentAttendance() {
 
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: "Present", value: present, key: "present" },
-            { label: "Absent", value: absent, key: "absent" },
-            { label: "Late", value: late, key: "late" },
+            { label: "Present", value: stats.present, key: "present" },
+            { label: "Absent", value: stats.absent, key: "absent" },
+            { label: "Late", value: stats.late, key: "late" },
           ].map((s, i) => {
             const cfg = statusConfig[s.key as keyof typeof statusConfig];
             return (
@@ -91,28 +139,28 @@ export default function StudentAttendance() {
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-3 px-1">Attendance History</h3>
           <div className="space-y-2">
-            {sorted.length === 0 && (
+            {records.length === 0 ? (
               <div className="bg-white rounded-2xl border border-border p-8 text-center">
                 <CalendarCheck size={32} className="mx-auto text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">No attendance records yet</p>
               </div>
+            ) : (
+              records.map((record, i) => {
+                const cfg = statusConfig[record.status];
+                return (
+                  <motion.div key={`${record.id}`}
+                    initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.04 }}
+                    className="bg-white rounded-xl border border-border px-4 py-3 flex items-center gap-3 shadow-sm"
+                  >
+                    <div className={`w-2 h-2 rounded-full ${cfg.color} flex-shrink-0`} />
+                    <p className="text-sm text-foreground flex-1">
+                      {new Date(record.date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
+                    </p>
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${cfg.bg} ${cfg.text}`}>{cfg.label}</span>
+                  </motion.div>
+                );
+              })
             )}
-            {sorted.map((record, i) => {
-              const cfg = statusConfig[record.status];
-              return (
-                <motion.div key={`${record.studentId}-${record.date}-${i}`}
-                  initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 + i * 0.04 }}
-                  className="bg-white rounded-xl border border-border px-4 py-3 flex items-center gap-3 shadow-sm"
-                  data-testid={`row-attendance-${i}`}
-                >
-                  <div className={`w-2 h-2 rounded-full ${cfg.color} flex-shrink-0`} />
-                  <p className="text-sm text-foreground flex-1">
-                    {new Date(record.date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
-                  </p>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${cfg.bg} ${cfg.text}`}>{cfg.label}</span>
-                </motion.div>
-              );
-            })}
           </div>
         </div>
       </div>

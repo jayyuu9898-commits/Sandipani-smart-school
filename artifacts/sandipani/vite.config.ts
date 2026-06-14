@@ -40,6 +40,24 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    target: 'esnext',
+    minify: 'esbuild',
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes('node_modules/@supabase')) {
+            return 'supabase-vendor';
+          }
+          if (id.includes('node_modules/@tanstack/react-query')) {
+            return 'query-vendor';
+          }
+          if (id.includes('node_modules/@radix-ui')) {
+            return 'ui-vendor';
+          }
+        },
+      },
+    },
   },
   server: {
     port,
@@ -48,6 +66,10 @@ export default defineConfig({
     allowedHosts: true,
     fs: {
       strict: true,
+    },
+    cors: {
+      origin: '*',
+      credentials: true,
     },
   },
   preview: {

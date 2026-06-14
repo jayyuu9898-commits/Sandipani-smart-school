@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { mockHomework, mockClasses, Homework } from "@/data/mockData";
-import { LayoutDashboard, CalendarCheck, BookOpen, FileText, Trophy, Plus, Paperclip, Calendar } from "lucide-react";
+import { LayoutDashboard, CalendarCheck, BookOpen, FileText, Trophy, Plus, Paperclip, Calendar, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
@@ -23,28 +23,104 @@ const navItems = [
 const subjects = ["Mathematics", "Science", "English", "History", "Geography"];
 
 export default function TeacherHomework() {
-  const [homeworkList, setHomeworkList] = useState<Homework[]>(mockHomework);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ title: "", subject: subjects[0], classId: "c1", dueDate: "", description: "" });
+  const { user } = useAuth();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [classes, setClasses] = useState<any[]>([]);
+  const [homeworkList, setHomeworkList] = useState<any[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ title: "", subject: subjects[0], classId: "", dueDate: "", description: "" });
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.title || !form.dueDate) return;
-    const newHw: Homework = {
-      id: `hw${Date.now()}`, ...form,
-      teacherId: "t1",
-      uploadedAt: new Date().toISOString(),
+  // Fetch teacher's classes
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchClasses = async () => {
+      try {
+        const { data, error: err } = await supabase
+          .from("classes")
+          .select("id, name, section")
+          .eq("teacher_id", user.id);
+
+        if (err) throw err;
+        setClasses(data || []);
+        if (data && data.length > 0) {
+          setForm(f => ({ ...f, classId: data[0].id }));
+        }
+      } catch (err: any) {
+        console.error("Error fetching classes:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     };
-    setHomeworkList(prev => [newHw, ...prev]);
-    setForm({ title: "", subject: subjects[0], classId: "c1", dueDate: "", description: "" });
-    setShowForm(false);
-    toast({ title: "Homework uploaded", description: `"${newHw.title}" assigned successfully.` });
-  };
 
-  const getClassName = (classId: string) => {
-    const cls = mockClasses.find(c => c.id === classId);
-    return cls ? `${cls.name} ${cls.section}` : classId;
+    fetchClasses();
+  }, [user?.id]);
+
+  // Fetch homework
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchHomework = async () => {
+      try {
+        const { data, error: err } = await supabase
+          .from("homework")
+          .select("id, title, description, subject, class_id, due_date, status, created_at")
+          .eq("teacher_id", user.id)
+          .order("due_date", { ascending: false });
+
+        if (err) throw err;
+        setHomeworkList(data || []);
+      } catch (err: any) {
+        console.error("Error fetching homework:", err);
+      }
+    };
+
+    fetchHomework();
+  }, [user?.id]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.title || !form.dueDate || !form.classId) {
+      toast({ title: "Error", description: "Please fill all required fields", variant: "destructive" });
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError(null);
+
+      const { data, error: err } = await supabase
+        .from("homework")
+        .insert([
+          {
+            title: form.title,
+            description: form.description,
+            subject: form.subject,
+            class_id: form.classId,
+            teacher_id: user?.id,
+            due_date: new Date(form.dueDate).toISOString(),
+            status: "active",
+            created_by: user?.id,
+          },
+        ])
+        .select();
+
+      if (err) throw err;
+
+      setHomeworkList(prev => [...(data || []), ...prev]);
+      setForm({ title: "", subject: subjects[0], classId: classes[0]?.id || "", dueDate: "", description: "" });
+      setShowForm(false);
+      toast({ title: "Homework uploaded", description: `"${form.title}" assigned successfully.` });
+    } catch (err: any) {
+      console.error("Error creating homework:", err);
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const getDueStatus = (dueDate: string) => {
@@ -56,11 +132,32 @@ export default function TeacherHomework() {
     return { label: `Due in ${diff}d`, className: "bg-emerald-100 text-emerald-600" };
   };
 
+  const getClassName = (classId: string) => {
+    const cls = classes.find(c => c.id === classId);
+    return cls ? `${cls.name} ${cls.section}` : classId;
+  };
+
+  if (loading) {
+    return (
+      <MobileLayout header={<Header title="Homework" />} bottomNav={<BottomNav items={navItems} />}>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 size={28} className="animate-spin text-primary" />
+        </div>
+      </MobileLayout>
+    );
+  }
+
   return (
     <MobileLayout header={<Header title="Homework" />} bottomNav={<BottomNav items={navItems} />}>
       <div className="p-4 space-y-4">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+            <p className="text-red-700 text-xs">{error}</p>
+          </div>
+        )}
+
         {!showForm ? (
-          <Button className="w-full rounded-xl" onClick={() => setShowForm(true)} data-testid="button-new-homework">
+          <Button className="w-full rounded-xl" onClick={() => setShowForm(true)}>
             <Plus size={16} className="mr-2" /> Assign New Homework
           </Button>
         ) : (
@@ -79,7 +176,7 @@ export default function TeacherHomework() {
                 <div className="space-y-1">
                   <Label>Class</Label>
                   <select className="w-full border rounded-lg px-3 py-2 text-sm bg-white" value={form.classId} onChange={e => setForm(f => ({ ...f, classId: e.target.value }))}>
-                    {mockClasses.map(c => <option key={c.id} value={c.id}>{c.name} {c.section}</option>)}
+                    {classes.map(c => <option key={c.id} value={c.id}>{c.name} {c.section}</option>)}
                   </select>
                 </div>
               </div>
@@ -92,7 +189,10 @@ export default function TeacherHomework() {
               </div>
               <div className="flex gap-2">
                 <Button type="button" variant="outline" className="flex-1" onClick={() => setShowForm(false)}>Cancel</Button>
-                <Button type="submit" className="flex-1">Upload</Button>
+                <Button type="submit" className="flex-1" disabled={saving}>
+                  {saving ? <Loader2 size={14} className="animate-spin mr-2" /> : null}
+                  Upload
+                </Button>
               </div>
             </form>
           </motion.div>
@@ -101,28 +201,33 @@ export default function TeacherHomework() {
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-3 px-1">Uploaded Assignments ({homeworkList.length})</h3>
           <div className="space-y-2">
-            {homeworkList.map((hw, i) => {
-              const due = getDueStatus(hw.dueDate);
-              return (
-                <motion.div key={hw.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-                  className="bg-white rounded-2xl border border-border p-3 shadow-sm"
-                  data-testid={`card-homework-${hw.id}`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-foreground truncate">{hw.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{hw.subject} · {getClassName(hw.classId)}</p>
-                      {hw.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{hw.description}</p>}
+            {homeworkList.length > 0 ? (
+              homeworkList.map((hw, i) => {
+                const due = getDueStatus(hw.due_date);
+                return (
+                  <motion.div key={hw.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                    className="bg-white rounded-2xl border border-border p-3 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-foreground truncate">{hw.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{hw.subject} · {getClassName(hw.class_id)}</p>
+                        {hw.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{hw.description}</p>}
+                      </div>
+                      <span className={`text-[10px] font-medium px-2 py-1 rounded-lg flex-shrink-0 ${due.className}`}>{due.label}</span>
                     </div>
-                    <span className={`text-[10px] font-medium px-2 py-1 rounded-lg flex-shrink-0 ${due.className}`}>{due.label}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 mt-2">
-                    <Calendar size={11} className="text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">Due: {new Date(hw.dueDate).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>
-                  </div>
-                </motion.div>
-              );
-            })}
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <Calendar size={11} className="text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">Due: {new Date(hw.due_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>
+                    </div>
+                  </motion.div>
+                );
+              })
+            ) : (
+              <div className="bg-white rounded-2xl border border-border p-4 text-center">
+                <p className="text-xs text-muted-foreground">No homework assigned yet</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

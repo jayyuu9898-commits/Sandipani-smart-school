@@ -4,6 +4,8 @@
   "license": "MIT",
   "scripts": {
     "build": "cd artifacts/sandipani && node ./node_modules/vite/bin/vite.js build && cd ../api-server && node ./build.mjs && cd ../mockup-sandbox && BASE_PATH=/ node ./node_modules/vite/bin/vite.js build",
+    "start": "cd artifacts/api-server && PORT=${PORT:-3000} node --enable-source-maps ./dist/index.mjs",
+    "dev": "cd artifacts/api-server && PORT=3000 pnpm run dev",
     "typecheck:libs": "tsc --build",
     "typecheck": "tsc --build"
   },

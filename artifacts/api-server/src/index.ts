@@ -15,11 +15,12 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-app.listen(port, (err) => {
+// Bind to 0.0.0.0 to accept connections from any interface (required for deployment)
+app.listen(port, "0.0.0.0", (err?: Error) => {
   if (err) {
     logger.error({ err }, "Error listening on port");
     process.exit(1);
   }
 
-  logger.info({ port }, "Server listening");
+  logger.info({ port, host: "0.0.0.0" }, "Server listening");
 });

@@ -1,9 +1,10 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { mockTeachers, mockStudents, mockHomework, mockClasses } from "@/data/mockData";
-import { LayoutDashboard, CalendarCheck, BookOpen, FileText, Trophy, Users, Clock, ChevronRight } from "lucide-react";
+import { LayoutDashboard, CalendarCheck, BookOpen, FileText, Trophy, Users, Clock, Loader2 } from "lucide-react";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
@@ -23,30 +24,115 @@ const quickActions = [
   { label: "Publish Results", href: "/teacher/results", icon: Trophy, color: "from-amber-500 to-amber-600", desc: "Enter marks & grades" },
 ];
 
-const schedule = [
-  { time: "08:00 – 08:45", subject: "Mathematics", class: "Class 8A", period: 1 },
-  { time: "09:45 – 10:30", subject: "Mathematics", class: "Class 9B", period: 3 },
-  { time: "11:30 – 12:15", subject: "Mathematics", class: "Class 8A", period: 5 },
-];
-
 export default function TeacherDashboard() {
   const { user } = useAuth();
-  const teacher = mockTeachers.find(t => t.name === user?.name) ?? mockTeachers[0];
-  const myStudents = mockStudents.filter(s => teacher.classIds.includes(s.classId));
-  const pendingHw = mockHomework.filter(h => h.teacherId === teacher.id && new Date(h.dueDate) > new Date());
-  const myClasses = mockClasses.filter(c => teacher.classIds.includes(c.id));
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ classCount: 0, studentCount: 0, pendingHw: 0 });
+  const [schedule, setSchedule] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchDashboardData = async () => {
+      try {
+        setError(null);
+
+        // Fetch teacher's classes
+        const { data: classes, error: classError } = await supabase
+          .from("classes")
+          .select("id, name, section")
+          .eq("teacher_id", user.id);
+
+        if (classError) throw classError;
+
+        // Count students in teacher's classes
+        if (classes && classes.length > 0) {
+          const classIds = classes.map(c => c.id);
+          const { count: studentCount, error: studentError } = await supabase
+            .from("students")
+            .select("*", { count: "exact", head: true })
+            .in("class_id", classIds);
+
+          if (studentError) throw studentError;
+
+          // Fetch pending homework
+          const { count: hwCount, error: hwError } = await supabase
+            .from("homework")
+            .select("*", { count: "exact", head: true })
+            .eq("teacher_id", user.id)
+            .gt("due_date", new Date().toISOString());
+
+          if (hwError) throw hwError;
+
+          // Fetch today's timetable
+          const dayName = new Date().toLocaleDateString("en-US", { weekday: "long" });
+          const { data: timetable, error: ttError } = await supabase
+            .from("timetables")
+            .select("id, day, period, subject, start_time, end_time, class_id, classes!inner(name, section)")
+            .eq("teacher_id", user.id)
+            .eq("day", dayName)
+            .order("period");
+
+          if (ttError) throw ttError;
+
+          setStats({
+            classCount: classes.length,
+            studentCount: studentCount || 0,
+            pendingHw: hwCount || 0,
+          });
+
+          if (timetable) {
+            setSchedule(
+              timetable.map((t: any) => ({
+                time: `${t.start_time} – ${t.end_time}`,
+                subject: t.subject,
+                class: `${t.classes?.name} ${t.classes?.section}`,
+                period: t.period,
+              }))
+            );
+          }
+        } else {
+          setStats({ classCount: 0, studentCount: 0, pendingHw: 0 });
+        }
+      } catch (err: any) {
+        console.error("Error fetching dashboard data:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [user?.id]);
 
   const now = new Date();
   const greeting = now.getHours() < 12 ? "Good morning" : now.getHours() < 17 ? "Good afternoon" : "Good evening";
 
+  if (loading) {
+    return (
+      <MobileLayout header={<Header />} bottomNav={<BottomNav items={navItems} />}>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 size={28} className="animate-spin text-primary" />
+        </div>
+      </MobileLayout>
+    );
+  }
+
   return (
     <MobileLayout header={<Header />} bottomNav={<BottomNav items={navItems} />}>
       <div className="p-4 space-y-5">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+            <p className="text-red-700 text-xs">{error}</p>
+          </div>
+        )}
+
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
           <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-5 text-white shadow-lg">
             <p className="text-white/80 text-sm">{greeting},</p>
-            <h2 className="text-xl font-bold mt-0.5">{user?.name}</h2>
-            <p className="text-white/70 text-xs mt-1">{teacher.subject} Teacher</p>
+            <h2 className="text-xl font-bold mt-0.5">{user?.fullName}</h2>
+            <p className="text-white/70 text-xs mt-1">Teacher</p>
             <p className="text-white/60 text-xs mt-1">
               {now.toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
             </p>
@@ -55,9 +141,9 @@ export default function TeacherDashboard() {
 
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: "My Classes", value: myClasses.length, icon: BookOpen, color: "text-blue-600 bg-blue-50" },
-            { label: "My Students", value: myStudents.length, icon: Users, color: "text-violet-600 bg-violet-50" },
-            { label: "Pending HW", value: pendingHw.length, icon: CalendarCheck, color: "text-amber-600 bg-amber-50" },
+            { label: "My Classes", value: stats.classCount, icon: BookOpen, color: "text-blue-600 bg-blue-50" },
+            { label: "My Students", value: stats.studentCount, icon: Users, color: "text-violet-600 bg-violet-50" },
+            { label: "Pending HW", value: stats.pendingHw, icon: CalendarCheck, color: "text-amber-600 bg-amber-50" },
           ].map((stat, i) => {
             const Icon = stat.icon;
             return (
@@ -77,17 +163,23 @@ export default function TeacherDashboard() {
             <Clock size={14} className="text-muted-foreground" />
           </div>
           <div className="space-y-2">
-            {schedule.map((item, i) => (
-              <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + i * 0.07 }}
-                className="bg-white rounded-2xl border border-border p-3 flex items-center gap-3 shadow-sm">
-                <div className="w-1 h-12 bg-primary rounded-full flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="font-semibold text-sm">{item.subject}</p>
-                  <p className="text-xs text-muted-foreground">{item.class} · Period {item.period}</p>
-                </div>
-                <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-lg">{item.time}</span>
-              </motion.div>
-            ))}
+            {schedule.length > 0 ? (
+              schedule.map((item, i) => (
+                <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + i * 0.07 }}
+                  className="bg-white rounded-2xl border border-border p-3 flex items-center gap-3 shadow-sm">
+                  <div className="w-1 h-12 bg-primary rounded-full flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm">{item.subject}</p>
+                    <p className="text-xs text-muted-foreground">{item.class} · Period {item.period}</p>
+                  </div>
+                  <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-lg">{item.time}</span>
+                </motion.div>
+              ))
+            ) : (
+              <div className="bg-white rounded-2xl border border-border p-4 text-center">
+                <p className="text-xs text-muted-foreground">No classes scheduled for today</p>
+              </div>
+            )}
           </div>
         </div>
 

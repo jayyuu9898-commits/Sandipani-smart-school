@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { mockStudents, mockClasses } from "@/data/mockData";
-import { LayoutDashboard, CalendarCheck, BookOpen, FileText, Trophy, Check, X, Clock } from "lucide-react";
+import { LayoutDashboard, CalendarCheck, BookOpen, FileText, Trophy, Check, X, Clock, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,21 +22,94 @@ const navItems = [
 type AttStatus = "present" | "absent" | "late";
 
 export default function TeacherAttendance() {
-  const [selectedClass, setSelectedClass] = useState("c1");
-  const [submitted, setSubmitted] = useState(false);
+  const { user } = useAuth();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [classes, setClasses] = useState<any[]>([]);
+  const [selectedClass, setSelectedClass] = useState<string>("");
+  const [classStudents, setClassStudents] = useState<any[]>([]);
+  const [attendance, setAttendance] = useState<Record<string, AttStatus>>({});
+  const [saving, setSaving] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const classStudents = mockStudents.filter(s => s.classId === selectedClass);
-  const [attendance, setAttendance] = useState<Record<string, AttStatus>>(() => {
-    const init: Record<string, AttStatus> = {};
-    mockStudents.forEach(s => { init[s.id] = "present"; });
-    return init;
-  });
+  const today = new Date().toISOString().split("T")[0];
+  const todayDisplay = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" });
 
-  const today = new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" });
+  // Fetch teacher's classes
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchClasses = async () => {
+      try {
+        const { data, error: err } = await supabase
+          .from("classes")
+          .select("id, name, section")
+          .eq("teacher_id", user.id);
+
+        if (err) throw err;
+        setClasses(data || []);
+        if (data && data.length > 0) {
+          setSelectedClass(data[0].id);
+        }
+      } catch (err: any) {
+        console.error("Error fetching classes:", err);
+        setError(err.message);
+      }
+    };
+
+    fetchClasses();
+  }, [user?.id]);
+
+  // Fetch students for selected class and today's attendance
+  useEffect(() => {
+    if (!selectedClass) return;
+
+    const fetchStudentsAndAttendance = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        setSubmitted(false);
+
+        // Get students in class
+        const { data: students, error: studErr } = await supabase
+          .from("students")
+          .select("id, full_name, roll_no")
+          .eq("class_id", selectedClass);
+
+        if (studErr) throw studErr;
+        setClassStudents(students || []);
+
+        // Get today's attendance records
+        const { data: attRecords, error: attErr } = await supabase
+          .from("attendance")
+          .select("student_id, status")
+          .eq("class_id", selectedClass)
+          .eq("date", today);
+
+        if (attErr) throw attErr;
+
+        // Initialize attendance state
+        const attMap: Record<string, AttStatus> = {};
+        students?.forEach(s => {
+          const existing = attRecords?.find(a => a.student_id === s.id);
+          attMap[s.id] = existing ? existing.status : "present";
+        });
+        setAttendance(attMap);
+      } catch (err: any) {
+        console.error("Error fetching attendance:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudentsAndAttendance();
+  }, [selectedClass, today]);
 
   const setStatus = (studentId: string, status: AttStatus) => {
     setAttendance(prev => ({ ...prev, [studentId]: status }));
+    setSubmitted(false);
   };
 
   const summary = {
@@ -44,28 +118,69 @@ export default function TeacherAttendance() {
     late: classStudents.filter(s => attendance[s.id] === "late").length,
   };
 
-  const handleSubmit = () => {
-    setSubmitted(true);
-    toast({ title: "Attendance Saved", description: `Attendance for ${mockClasses.find(c => c.id === selectedClass)?.name} recorded.` });
+  const handleSubmit = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+
+      const attendanceRecords = classStudents.map(student => ({
+        student_id: student.id,
+        class_id: selectedClass,
+        date: today,
+        status: attendance[student.id] || "present",
+        marked_by: user?.id,
+      }));
+
+      // Upsert attendance records
+      const { error: err } = await supabase
+        .from("attendance")
+        .upsert(attendanceRecords, { onConflict: "student_id,date" });
+
+      if (err) throw err;
+
+      setSubmitted(true);
+      const className = classes.find(c => c.id === selectedClass)?.name;
+      toast({ title: "Attendance Saved", description: `Attendance for ${className} recorded successfully.` });
+    } catch (err: any) {
+      console.error("Error saving attendance:", err);
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const getInitials = (name: string) => name.split(" ").map(n => n[0]).join("").slice(0, 2);
 
+  if (loading && classStudents.length === 0) {
+    return (
+      <MobileLayout header={<Header title="Mark Attendance" />} bottomNav={<BottomNav items={navItems} />}>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 size={28} className="animate-spin text-primary" />
+        </div>
+      </MobileLayout>
+    );
+  }
+
   return (
     <MobileLayout header={<Header title="Mark Attendance" />} bottomNav={<BottomNav items={navItems} />}>
       <div className="p-4 space-y-4">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3">
+            <p className="text-red-700 text-xs">{error}</p>
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">{today}</p>
+          <p className="text-xs text-muted-foreground">{todayDisplay}</p>
           {submitted && <Badge className="bg-emerald-500 text-white text-xs">Saved</Badge>}
         </div>
 
         <div>
           <p className="text-xs text-muted-foreground mb-2">Select Class</p>
           <div className="flex gap-2 flex-wrap">
-            {mockClasses.map(cls => (
-              <button key={cls.id} onClick={() => { setSelectedClass(cls.id); setSubmitted(false); }}
+            {classes.map(cls => (
+              <button key={cls.id} onClick={() => setSelectedClass(cls.id)}
                 className={cn("px-3 py-1.5 rounded-xl text-sm font-medium transition-all", selectedClass === cls.id ? "bg-primary text-white shadow-sm" : "bg-white border border-border text-muted-foreground")}
-                data-testid={`button-class-${cls.id}`}
               >
                 {cls.name} {cls.section}
               </button>
@@ -97,14 +212,13 @@ export default function TeacherAttendance() {
             return (
               <motion.div key={student.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
                 className="bg-white rounded-2xl border border-border p-3 flex items-center gap-3 shadow-sm"
-                data-testid={`row-student-${student.id}`}
               >
                 <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-xs flex-shrink-0">
-                  {getInitials(student.name)}
+                  {getInitials(student.full_name)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm truncate">{student.name}</p>
-                  <p className="text-xs text-muted-foreground">Roll #{student.rollNo}</p>
+                  <p className="font-medium text-sm truncate">{student.full_name}</p>
+                  <p className="text-xs text-muted-foreground">Roll #{student.roll_no}</p>
                 </div>
                 <div className="flex gap-1.5">
                   {(["present", "absent", "late"] as AttStatus[]).map(s => (
@@ -114,7 +228,6 @@ export default function TeacherAttendance() {
                           ? s === "present" ? "bg-emerald-500 text-white" : s === "absent" ? "bg-red-500 text-white" : "bg-amber-500 text-white"
                           : "bg-gray-100 text-gray-400 hover:bg-gray-200"
                       )}
-                      data-testid={`button-${s}-${student.id}`}
                     >
                       {s === "present" ? <Check size={14} /> : s === "absent" ? <X size={14} /> : <Clock size={14} />}
                     </button>
@@ -126,7 +239,12 @@ export default function TeacherAttendance() {
         </div>
 
         <div className="pb-2">
-          <Button className="w-full h-12 rounded-xl text-base font-semibold" onClick={handleSubmit} data-testid="button-submit-attendance">
+          <Button 
+            className="w-full h-12 rounded-xl text-base font-semibold" 
+            onClick={handleSubmit}
+            disabled={saving}
+          >
+            {saving ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
             {submitted ? "Update Attendance" : "Save Attendance"}
           </Button>
         </div>
