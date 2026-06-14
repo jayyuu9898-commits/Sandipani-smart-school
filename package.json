@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "tsc --build && cd artifacts/sandipani && node ./node_modules/vite/bin/vite.js build && cd ../api-server && node ./build.mjs && cd ../mockup-sandbox && BASE_PATH=/ node ./node_modules/vite/bin/vite.js build",
+    "build": "cd artifacts/sandipani && node ./node_modules/vite/bin/vite.js build && cd ../api-server && node ./build.mjs && cd ../mockup-sandbox && BASE_PATH=/ node ./node_modules/vite/bin/vite.js build",
     "typecheck:libs": "tsc --build",
     "typecheck": "tsc --build"
   },

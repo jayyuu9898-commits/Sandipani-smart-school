@@ -59,22 +59,6 @@ export type Notice = {
   updated_at: string;
 };
 
-export type Fee = {
-  id: string;
-  student_id: string;
-  fee_type: string;
-  amount: number;
-  due_date: string;
-  paid_date: string | null;
-  status: string;
-  payment_mode: string | null;
-  receipt_no: string | null;
-  academic_year: string | null;
-  remarks: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
 export type ExamResult = {
   id: string;
   student_id: string;

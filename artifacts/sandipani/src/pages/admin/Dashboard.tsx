@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Footer } from "@/components/layout/Footer";
 import { supabase } from "@/lib/supabase";
-import { LayoutDashboard, Users, UserCheck, BookOpen, TrendingUp, CalendarCheck, GraduationCap, Settings, Bell, Clock, Loader2, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Users, UserCheck, BookOpen, TrendingUp, CalendarCheck, GraduationCap, Settings, Bell, Clock, Loader as Loader2, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

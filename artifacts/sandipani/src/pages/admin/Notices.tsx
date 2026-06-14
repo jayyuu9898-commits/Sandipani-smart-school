@@ -9,16 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Bell,
-  Plus,
-  Pencil,
-  Trash2,
-  Loader2,
-  Megaphone,
-  Calendar,
-  Users
-} from "lucide-react";
+import { Bell, Plus, Pencil, Trash2, Loader as Loader2, Megaphone, Calendar, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   Dialog,

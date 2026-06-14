@@ -10,19 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Settings as SettingsIcon,
-  School,
-  Phone,
-  Mail,
-  Globe,
-  MapPin,
-  Calendar,
-  FileText,
-  Save,
-  Loader2,
-  User
-} from "lucide-react";
+import { Settings as SettingsIcon, School, Phone, Mail, Globe, MapPin, Calendar, FileText, Save, Loader as Loader2, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

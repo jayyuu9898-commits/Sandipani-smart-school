@@ -3,20 +3,9 @@ import { useAuth } from "@/context/AuthContext";
 import { MobileLayout } from "@/components/layout/MobileLayout";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { supabase, StudentRecord, Fee, ExamResult } from "@/lib/supabase";
+import { supabase, StudentRecord, ExamResult } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
-import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  GraduationCap,
-  BookOpen,
-  CreditCard,
-  Award,
-  Loader2,
-} from "lucide-react";
+import { User, Mail, Phone, MapPin, Calendar, GraduationCap, BookOpen, Award, Loader as Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,7 +21,6 @@ export default function StudentProfile() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [student, setStudent] = useState<StudentRecord | null>(null);
-  const [fees, setFees] = useState<Fee[]>([]);
   const [results, setResults] = useState<ExamResult[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +34,6 @@ export default function StudentProfile() {
     if (!user) return;
 
     try {
-      // Fetch student record by email
       const { data: studentData, error: studentError } = await supabase
         .from("students")
         .select("*")
@@ -57,16 +44,6 @@ export default function StudentProfile() {
       setStudent(studentData);
 
       if (studentData) {
-        // Fetch fees
-        const { data: feesData } = await supabase
-          .from("fees")
-          .select("*")
-          .eq("student_id", studentData.id)
-          .order("due_date", { ascending: false });
-
-        setFees(feesData || []);
-
-        // Fetch results
         const { data: resultsData } = await supabase
           .from("exam_results")
           .select("*")
@@ -83,19 +60,6 @@ export default function StudentProfile() {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "paid":
-        return "bg-green-100 text-green-700";
-      case "overdue":
-        return "bg-red-100 text-red-700";
-      case "waived":
-        return "bg-blue-100 text-blue-700";
-      default:
-        return "bg-yellow-100 text-yellow-700";
     }
   };
 
@@ -139,9 +103,8 @@ export default function StudentProfile() {
         </motion.div>
 
         <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="fees">Fees</TabsTrigger>
             <TabsTrigger value="results">Results</TabsTrigger>
           </TabsList>
 
@@ -230,38 +193,6 @@ export default function StudentProfile() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="fees" className="mt-4">
-            {fees.length === 0 ? (
-              <div className="text-center py-12">
-                <CreditCard size={48} className="mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No fee records found</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {fees.map((fee) => (
-                  <Card key={fee.id}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-sm">{fee.fee_type}</p>
-                          <p className="text-xs text-muted-foreground">
-                            Due: {new Date(fee.due_date).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold">Rs. {fee.amount.toLocaleString()}</p>
-                          <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(fee.status)}`}>
-                            {fee.status}
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
           <TabsContent value="results" className="mt-4">
             {results.length === 0 ? (
               <div className="text-center py-12">
@@ -303,3 +234,6 @@ export default function StudentProfile() {
     </MobileLayout>
   );
 }
+
+
+export default StudentProfile
