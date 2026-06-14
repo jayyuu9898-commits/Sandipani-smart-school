@@ -28,10 +28,10 @@ interface QuickAction {
 const quickActions: QuickAction[] = [
   { label: "Manage Students", href: "/admin/students", icon: Users, color: "from-blue-500 to-blue-600" },
   { label: "Manage Teachers", href: "/admin/teachers", icon: UserCheck, color: "from-emerald-500 to-emerald-600" },
+  { label: "Manage Users", href: "/admin/users", icon: Users, color: "from-teal-500 to-teal-600" },
   { label: "Manage Classes", href: "/admin/classes", icon: BookOpen, color: "from-violet-500 to-violet-600" },
   { label: "School Settings", href: "/admin/settings", icon: Settings, color: "from-gray-600 to-gray-700" },
   { label: "Notices", href: "/admin/notices", icon: Bell, color: "from-orange-500 to-orange-600" },
-  { label: "Timetables", href: "/admin/timetable", icon: Clock, color: "from-cyan-500 to-cyan-600" },
 ];
 
 export default function AdminDashboard() {

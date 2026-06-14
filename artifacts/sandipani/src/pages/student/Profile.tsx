@@ -234,6 +234,3 @@ export default function StudentProfile() {
     </MobileLayout>
   );
 }
-
-
-export default StudentProfile

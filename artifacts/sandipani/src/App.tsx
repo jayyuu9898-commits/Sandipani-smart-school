@@ -15,6 +15,7 @@ import AdminClasses from "@/pages/admin/Classes";
 import AdminSettings from "@/pages/admin/Settings";
 import AdminNotices from "@/pages/admin/Notices";
 import AdminTimetable from "@/pages/admin/Timetable";
+import AdminUsers from "@/pages/admin/Users";
 import TeacherDashboard from "@/pages/teacher/Dashboard";
 import TeacherAttendance from "@/pages/teacher/Attendance";
 import TeacherHomework from "@/pages/teacher/Homework";
@@ -31,14 +32,16 @@ import StudentProfile from "@/pages/student/Profile";
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ component: Component, role }: { component: React.ComponentType; role?: string }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return null;
   if (!user) return <Redirect to="/login" />;
   if (role && user.role !== role) return <Redirect to="/login" />;
   return <Component />;
 }
 
 function Router() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return null;
   return (
     <Switch>
       <Route path="/" component={Landing} />
@@ -52,6 +55,7 @@ function Router() {
       <Route path="/admin/settings">{() => <ProtectedRoute component={AdminSettings} role="admin" />}</Route>
       <Route path="/admin/notices">{() => <ProtectedRoute component={AdminNotices} role="admin" />}</Route>
       <Route path="/admin/timetable">{() => <ProtectedRoute component={AdminTimetable} role="admin" />}</Route>
+      <Route path="/admin/users">{() => <ProtectedRoute component={AdminUsers} role="admin" />}</Route>
       <Route path="/teacher">{() => <ProtectedRoute component={TeacherDashboard} role="teacher" />}</Route>
       <Route path="/teacher/attendance">{() => <ProtectedRoute component={TeacherAttendance} role="teacher" />}</Route>
       <Route path="/teacher/homework">{() => <ProtectedRoute component={TeacherHomework} role="teacher" />}</Route>

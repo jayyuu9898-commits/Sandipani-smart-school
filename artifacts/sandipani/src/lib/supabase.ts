@@ -123,3 +123,20 @@ export type AttendanceRecord = {
   created_at: string;
   updated_at: string;
 };
+
+export type UserProfile = {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  mobile_number: string | null;
+  role: string;
+  avatar_url: string | null;
+  class_id: string | null;
+  subject: string | null;
+  section: string | null;
+  stream: string | null;
+  is_active: boolean;
+  is_approved: boolean;
+  created_at: string;
+  updated_at: string;
+};
