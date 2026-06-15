@@ -58,12 +58,13 @@ app.use(express.urlencoded({ extended: true }));
 // API routes
 app.use("/api", router);
 
-// Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, '../../sandipani/dist');
+  // 📂 Bilkul exact path mapping pure dist folder ke liye
+  const frontendPath = path.resolve(__dirname, '../../sandipani/dist');
+  
   app.use(express.static(frontendPath));
   
-  // Wildcard string ko hata kar seedhe RegEx pattern lagate hain
+  // 🌐 Kisi bhi non-API route par seedhe index.html serve karna
   app.get(/^(?!\/api).*$/, (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
