@@ -60,17 +60,12 @@ app.use("/api", router);
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  // 📂 Sahi folder path jahan production build ki files hain
   const frontendPath = path.join(__dirname, '../../sandipani/dist');
   app.use(express.static(frontendPath));
   
-  // 🌐 SPA fallback - Yeh bina kisi crash ke index.html serve karega
-  app.get('/:path*', (req, res) => {
-    if (!req.path.startsWith('/api')) {
-      res.sendFile(path.join(frontendPath, 'index.html'));
-    } else {
-      res.status(404).json({ error: 'Not found' });
-    }
+  // Wildcard string ko hata kar seedhe RegEx pattern lagate hain
+  app.get(/^(?!\/api).*$/, (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
 
