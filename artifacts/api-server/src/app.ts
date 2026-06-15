@@ -1,6 +1,6 @@
 import express, { type Express } from "express";
 import cors from "cors";
-import pinoHttp from "pino-http";à
+import pinoHttp from "pino-http";
 import path from "path";
 import { fileURLToPath } from "url";
 import router from "./routes";
@@ -18,7 +18,7 @@ app.use(
           id: req.id,
           method: req.method,
           url: req.url?.split("?")[0],
-        };àaa
+        };
       },
       res(res) {
         return {
