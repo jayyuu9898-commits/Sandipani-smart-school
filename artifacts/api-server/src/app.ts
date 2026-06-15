@@ -58,18 +58,17 @@ app.use(express.urlencoded({ extended: true }));
 // API routes
 app.use("/api", router);
 
-// Serve frontend in production
-if (process.env.NODE_ENV === 'production') {
- const frontendPath = path.join(process.cwd(), "../sandipani/dist/public"); 
-  app.use(express.static(frontendPath));
-  
-  // SPA fallback - serve index.html for all non-API routes
-  app.use((req, res) => {
-    if (req.path.startsWith('/api')) {
-      return res.status(404).json({ error: 'Not Found' });
-    }
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-}
+// Serve frontend
+const frontendPath = path.join(process.cwd(), "../sandipani/dist/public");
+
+app.use(express.static(frontendPath));
+
+app.use((req, res) => {
+  if (req.path.startsWith("/api")) {
+    return res.status(404).json({ error: "Not Found" });
+  }
+
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
 
 export default app;
