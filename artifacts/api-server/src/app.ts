@@ -1,6 +1,6 @@
 import express, { type Express } from "express";
 import cors from "cors";
-import pinoHttp from "pino-http";
+import pinoHttp from "pino-http";à
 import path from "path";
 import { fileURLToPath } from "url";
 import router from "./routes";
@@ -18,7 +18,7 @@ app.use(
           id: req.id,
           method: req.method,
           url: req.url?.split("?")[0],
-        };
+        };àaa
       },
       res(res) {
         return {
@@ -59,12 +59,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", router);
 
 if (process.env.NODE_ENV === 'production') {
-  // 📂 Bilkul exact path mapping pure dist folder ke liye
-  const frontendPath = path.resolve(__dirname, '../../sandipani/dist');
-  
+  // 📂 Sahi path jo 'dist/public' folder ko target karega
+  const frontendPath = path.join(__dirname, '../../sandipani/dist/public');
   app.use(express.static(frontendPath));
   
-  // 🌐 Kisi bhi non-API route par seedhe index.html serve karna
+  // 🌐 SPA fallback - RegEx pattern bina kisi crash ke index.html serve karega
   app.get(/^(?!\/api).*$/, (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
