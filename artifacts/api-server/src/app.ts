@@ -60,11 +60,11 @@ app.use("/api", router);
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  // 📂 Path ko 'dist' se badal kar 'dist/public' kar diya hai
-  const frontendPath = path.join(__dirname, '../../sandipani/dist/public');
+  // 📂 Pure dist folder ko absolute path se target karna
+  const frontendPath = path.resolve(__dirname, '../../sandipani/dist');
   app.use(express.static(frontendPath));
   
-  // 🌐 SPA fallback - RegEx pattern bina kisi crash ke index.html serve karega
+  // 🌐 Kisi bhi non-API route par seedhe index.html serve karna
   app.get(/^(?!\/api).*$/, (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
