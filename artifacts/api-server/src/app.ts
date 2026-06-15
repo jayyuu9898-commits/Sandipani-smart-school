@@ -61,7 +61,7 @@ app.use("/api", router);
 // Serve frontend
 const frontendPath = path.join(process.cwd(), "../sandipani/dist/public");
 
-console.log("FRONTED PATH:", frontendpath);
+console.log("FRONTED PATH:", frontendPath);
 app.use(express.static(frontendPath));
 
 app.use((req, res) => {
