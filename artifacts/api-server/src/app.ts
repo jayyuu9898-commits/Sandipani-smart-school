@@ -59,7 +59,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api", router);
 
 // Serve frontend
-const frontendPath = path.join(process.cwd(), "../sandipani/dist/public");
+const frontendPath = path.join(__dirname, "../../sandipani/dist/public");
 
 console.log("FRONTED PATH:", frontendPath);
 app.use(express.static(frontendPath));
