@@ -58,8 +58,9 @@ app.use(express.urlencoded({ extended: true }));
 // API routes
 app.use("/api", router);
 
+// Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  // 📂 Sahi path jo 'dist/public' folder ko target karega
+  // 📂 Path ko 'dist' se badal kar 'dist/public' kar diya hai
   const frontendPath = path.join(__dirname, '../../sandipani/dist/public');
   app.use(express.static(frontendPath));
   
