@@ -60,11 +60,16 @@ app.use("/api", router);
 
 // Serve frontend
 const frontendPath = path.resolve(process.cwd(), "../sandipani/dist/public");
-app.use(express.static(frontendPath));
 
-app.use((req, res) => {
+console.log("FRONTEND:", frontendPath);
+
+app.use(express.static(frontendPath, {
+  index: false
+}));
+
+app.get("*", (req, res) => {
   if (req.path.startsWith("/api")) {
-    return res.status(404).json({ error: "Not Found" });
+    return res.status(404).json({error:"Not Found"});
   }
 
   res.sendFile(path.join(frontendPath, "index.html"));
