@@ -65,7 +65,6 @@ function Router() {
     </Switch>
   );
 }
-console.log("APP STARTED");
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
