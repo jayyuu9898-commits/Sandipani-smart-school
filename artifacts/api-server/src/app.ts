@@ -64,12 +64,11 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(frontendPath));
   
   // SPA fallback - serve index.html for all non-API routes
-  app.get('/*', (req, res) => {
-    if (!req.path.startsWith('/api')) {
-      res.sendFile(path.join(frontendPath, 'index.html'));
-    } else {
-      res.status(404).json({ error: 'Not found' });
+  app.use((req, res) => {
+    if (req.path.startsWith('/api')) {
+      return res.status(404).json({ error: 'Not Found' });
     }
+    res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
 
