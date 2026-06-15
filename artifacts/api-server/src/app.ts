@@ -60,7 +60,7 @@ app.use("/api", router);
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(process.cwd(), "artifacts/sandipani/dist/public");
+ const frontendPath = path.join(process.cwd(), "../sandipani/dist/public"); 
   app.use(express.static(frontendPath));
   
   // SPA fallback - serve index.html for all non-API routes
