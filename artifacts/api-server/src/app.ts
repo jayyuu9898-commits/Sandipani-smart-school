@@ -61,12 +61,16 @@ app.use("/api", router);
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
 <<<<<<< HEAD
+<<<<<<< HEAD
   // 📂 Pure dist folder ko absolute path se target karna
   const frontendPath = path.resolve(__dirname, '../../sandipani/dist');
 =======
   // Correct path to the frontend build output
   const frontendPath = path.join(__dirname, '../../sandipani/dist/public');
 >>>>>>> e286ff2 (Fix Render frontend static path)
+=======
+  const frontendPath = path.join(__dirname, '../../../sandipani/dist/public');
+>>>>>>> 463e61f (Fix Render dist public path)
   app.use(express.static(frontendPath));
   
   // 🌐 Kisi bhi non-API route par seedhe index.html serve karna
