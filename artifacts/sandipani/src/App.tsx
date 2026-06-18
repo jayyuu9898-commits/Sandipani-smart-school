@@ -65,18 +65,17 @@ function Router() {
     </Switch>
   );
 }
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <AuthProvider>
-            <Router />
-          </AuthProvider>
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
+  <WouterRouter base="/">
+    <AuthProvider>
+      <Router />
+      </AuthProvider>
+     </WouterRouter>
+     <Toaster />
+  </TooltipProvider>
     </QueryClientProvider>
   );
 }
