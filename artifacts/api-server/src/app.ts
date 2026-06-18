@@ -6,9 +6,7 @@ import router from './routes';
 const app = express();
 
 app.use((req, res, next) => {
-  req.log = logger.child({
-    // TODO: Add request-id
-  });
+  req.log = logger.child({});
   next();
 });
 
@@ -24,12 +22,23 @@ app.use('/api', router);
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, '../../sandipani/dist');
-  app.use(express.static(frontendPath));
+  // The path to the frontend build artifacts, relative to the project root.
+  const frontendBuildPath = path.resolve(process.cwd(), 'artifacts/sandipani/dist');
 
-  // SPA fallback - serve index.html for all non-API routes
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
+  // Serve static files (JS, CSS, images, etc.)
+  app.use(express.static(frontendBuildPath));
+
+  // SPA fallback: For any request that is not an API route and not a file,
+  // send back the main index.html file. This allows React Router to handle the route.
+  app.get('*', (req, res, next) => {
+    if (req.originalUrl.startsWith('/api/')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendBuildPath, 'index.html'), (err) => {
+      if (err) {
+        res.status(500).send('Error serving frontend. Did you build the frontend? ' + err.message);
+      }
+    });
   });
 }
 
