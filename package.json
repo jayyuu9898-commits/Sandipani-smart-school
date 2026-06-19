@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "cd artifacts/sandipani && node ./node_modules/vite/bin/vite.js build && cd ../api-server && node ./build.mjs && cd ../mockup-sandbox && BASE_PATH=/ node ./node_modules/vite/bin/vite.js build",
-    "start": "cd artifacts/api-server && PORT=${PORT:-3000} node --enable-source-maps ./dist/index.mjs",
+    "start": "npx pnpm --filter @workspace/api-server run start",
     "dev": "cd artifacts/api-server && PORT=3000 pnpm run dev",
     "typecheck:libs": "tsc --build",
     "typecheck": "tsc --build"
@@ -13,5 +13,8 @@
   "devDependencies": {
     "prettier": "^3.8.3",
     "typescript": "~5.9.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
   }
 }
