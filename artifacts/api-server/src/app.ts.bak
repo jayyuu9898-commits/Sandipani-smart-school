@@ -24,12 +24,14 @@ app.use('/api', router);
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  // Correct path to the frontend's build output
   const frontendPath = path.join(__dirname, '../../sandipani/dist/public');
   app.use(express.static(frontendPath));
 
-  // SPA fallback - serve index.html for all non-API routes
-  app.get(/(.*)/, (req, res) => {
+  // Middleware jo API routes ko chhoddkar baki sabko index.html bhejega
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
