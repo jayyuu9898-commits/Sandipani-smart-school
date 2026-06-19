@@ -30,16 +30,12 @@ if (process.env.NODE_ENV === 'production') {
 
   // SPA fallback: For any request that is not an API route and not a file,
   // send back the main index.html file. This allows React Router to handle the route.
-  app.get('*', (req, res, next) => {
-    if (req.originalUrl.startsWith('/api/')) {
-      return next();
-    }
-    res.sendFile(path.join(frontendBuildPath, 'index.html'), (err) => {
-      if (err) {
-        res.status(500).send('Error serving frontend. Did you build the frontend? ' + err.message);
-      }
-    });
-  });
+ app.use((req, res, next) => {
+  if (req.originalUrl.startsWith('/api')) {
+    return next();
+  }
+  res.sendFile(path.join(frontendBuildPath, 'index.html'));
+});
 }
 
 export default app;
