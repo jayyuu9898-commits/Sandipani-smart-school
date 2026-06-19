@@ -24,7 +24,7 @@ app.use('/api', router);
 if (process.env.NODE_ENV === 'production') {
   // The path to the frontend build artifacts, relative to the project root.
   const frontendBuildPath = path.resolve(process.cwd(), 'artifacts/sandipani/dist');
-
+console.log('Trying to serve files from:', frontendBuildPath);
   // Serve static files (JS, CSS, images, etc.)
   app.use(express.static(frontendBuildPath));
 
