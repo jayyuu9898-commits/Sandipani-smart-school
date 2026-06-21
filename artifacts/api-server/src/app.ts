@@ -1,5 +1,7 @@
 import express from 'express';
 import path from 'path';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { logger } from './lib/logger';
 import router from './routes';
 
@@ -10,6 +12,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
+app.use(cookieParser());
 app.use(express.json());
 app.use(
   express.urlencoded({
