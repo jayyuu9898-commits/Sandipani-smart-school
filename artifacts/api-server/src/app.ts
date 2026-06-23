@@ -1,4 +1,5 @@
-import express, { Request, Response, NextFunction } from 'express';
+import pinoHttp from "pino-http";
+import type { Request, Response } from "express";
 import path from 'path';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
