@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -7,7 +7,7 @@ import router from './routes';
 
 const app = express();
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   req.log = logger.child({});
   next();
 });
@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === 'production') {
 
   // SPA fallback: For any request that is not an API route and not a file,
   // send back the main index.html file. This allows React Router to handle the route.
-  app.use((req, res, next) => {
+  app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.path.startsWith('/api')) {
       return next();
     }
